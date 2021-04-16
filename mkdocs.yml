@@ -1,5 +1,5 @@
 site_name: kiara_modules.default
-repo_url: https://gitlab.com/frkl/kiara_modules.default
+repo_url: https://github.com/DHARPA-project/kiara_modules.default
 site_author: Markus Binsteiner
 docs_dir: docs
 site_dir: build/site

@@ -8,7 +8,7 @@
 
 A set of commonly used/useful default modules (and pipelines) for [*Kiara*](https://github.com/DHARPA-project/kiara).
 
- - Documentation: [https://dharpa.org/kiara](https://dharpa.org/kiara_modules.default)
+ - Documentation: [https://dharpa.org/kiara_modules.default](https://dharpa.org/kiara_modules.default)
  - Code: [https://github.com/DHARPA-Project/kiara](https://github.com/DHARPA-Project/kiara_modules.default)
 
 ## Description
