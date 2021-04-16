@@ -22,7 +22,8 @@ markdown_extensions:
 
 nav:
 - Home: index.md
-- Usage: usage.md
+- Included modules: modules_list.md
+- Included pipelines: pipelines_list.md
 
 plugins:
 - search
@@ -36,3 +37,6 @@ plugins:
    modules:
      - frkl.project.meta.documentation.mkdocs_macros_frkl
      - kiara.doc.mkdocs_macros_kiara
+- gen-files:
+    scripts:
+      - scripts/documentation/gen_module_doc.py
