@@ -1,0 +1,19 @@
+{
+  "title": "KiaraWorkflowConfig",
+  "description": "The object to hold a configuration for a workflow.",
+  "type": "object",
+  "properties": {
+    "module_type": {
+      "title": "Module Type",
+      "description": "The name of the 'root' module of this workflow.",
+      "default": "pipeline",
+      "type": "string"
+    },
+    "module_config": {
+      "title": "Module Config",
+      "description": "The configuration for the 'root' module of this workflow.",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

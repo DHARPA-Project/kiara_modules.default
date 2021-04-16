@@ -1,0 +1,13 @@
+{
+  "title": "KiaraModuleConfig",
+  "description": "Base class that describes the configuration a [KiaraModule][kiara.module.KiaraModule] class accepts.\n\nThis is stored in the ``_config_cls`` class attribute in each ``KiaraModule`` class. By default,\nsuch a ``KiaraModule`` is not configurable.",
+  "type": "object",
+  "properties": {
+    "constants": {
+      "title": "Constants",
+      "description": "Value constants for this module.",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

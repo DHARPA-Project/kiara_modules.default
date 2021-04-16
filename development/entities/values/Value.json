@@ -1,0 +1,146 @@
+{
+  "title": "Value",
+  "description": "A pointer to 'actual' data (bytes), along with metadata associated with this data.\n\nThis object is created by a [DataRegistry][kiara.data.registry.DataRegistry], and can be used to retrieve the associated data\nfrom that registry. In addition, it can be used to subscribe to change events for that data, using the [register_callback][kiara.data.registry.DataRegistry.register_callback] method.\nThe reason the data itself is not contained within this model is that the data could be very big,\nand it might not be necessary to hold them in memory in a lot of cases.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "description": "A unique id for this value.",
+      "type": "string"
+    },
+    "value_schema": {
+      "title": "Value Schema",
+      "description": "The schema of this value.",
+      "allOf": [
+        {
+          "$ref": "#/definitions/ValueSchema"
+        }
+      ]
+    },
+    "value_fields": {
+      "title": "Value Fields",
+      "description": "Value fields within a pipeline connected to this value.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ValueField"
+      }
+    },
+    "is_constant": {
+      "title": "Is Constant",
+      "description": "Whether this value is a constant.",
+      "default": false,
+      "type": "boolean"
+    },
+    "origin": {
+      "title": "Origin",
+      "description": "Description of how/where the value was set.",
+      "default": "n/a",
+      "type": "string"
+    },
+    "last_update": {
+      "title": "Last Update",
+      "description": "The time the last update to this value happened.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "is_streaming": {
+      "title": "Is Streaming",
+      "description": "Whether the value is currently streamed into this object.",
+      "default": false,
+      "type": "boolean"
+    },
+    "is_valid": {
+      "title": "Is Valid",
+      "description": "Whether the value is set and valid.",
+      "default": false,
+      "type": "boolean"
+    },
+    "metadata": {
+      "title": "Metadata",
+      "description": "Metadata relating to the actual data (size, no. of rows, etc. -- depending on data type).",
+      "type": "object"
+    }
+  },
+  "required": [
+    "id",
+    "value_schema"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "ValueType": {
+      "title": "ValueType",
+      "description": "Supported value types.\n\nIt's very early days, so this does not really do anything yet.",
+      "enum": [
+        "any",
+        "integer",
+        "string",
+        "dict",
+        "boolean",
+        "table",
+        "value_items"
+      ]
+    },
+    "ValueSchema": {
+      "title": "ValueSchema",
+      "description": "The schema of a value.\n\nThe schema contains the [ValueType][kiara.data.values.ValueType] of a value, as well as an optional default that\nwill be used if no user input was given (yet) for a value.\n\nFor more complex types like arrays and tables, a sub-schema will be available (e.g. columns of a table, type of\nthe array-items, ...). This bit is not implemented yet.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/ValueType"
+        },
+        "doc": {
+          "title": "Doc",
+          "description": "A description for the value of this input field.",
+          "default": "-- n/a --",
+          "type": "string"
+        },
+        "default": {
+          "title": "Default",
+          "description": "A default value."
+        },
+        "sub_schema": {
+          "title": "Sub Schema",
+          "description": "In case this schemas type is a container type (list, dict, ...), this field specifies the schema of its content.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ValueSchema"
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/ValueSchema"
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "ValueField": {
+      "title": "ValueField",
+      "description": "An object that holds information about the location of a value within a pipeline.\n\nThis object does not contain the value itself.\n\nThere are four different ValuePoint types:\n\n- [kiara.data.values.StepInputField][]: an input to a step\n- [kiara.data.values.StepOutputField][]: an output of a step\n- [kiara.data.values.PipelineInputField][]: an input to a pipeline\n- [kiara.data.values.PipelineOutputField][]: an output for a pipeline\n\nSeveral point objects can target the same value, for example a step output and a connected step input are\nactually the same.",
+      "type": "object",
+      "properties": {
+        "value_name": {
+          "title": "Value Name",
+          "type": "string"
+        },
+        "value_schema": {
+          "$ref": "#/definitions/ValueSchema"
+        },
+        "pipeline_id": {
+          "title": "Pipeline Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value_name",
+        "value_schema",
+        "pipeline_id"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
