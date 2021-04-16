@@ -20,7 +20,7 @@ a set of officially supported modules.
 
 ## Requirements
 
-- Python (version >=3.6 -- some make targets only work for Python >=3.7, but *kiara* itself should work on 3.6)
+- Python (version >=3.6 -- some make targets only work for Python >=3.7 though)
 - pip, virtualenv
 - git
 - make

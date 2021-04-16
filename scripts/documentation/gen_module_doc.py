@@ -18,7 +18,7 @@ The formatting here will be improved later on, for now this should be enough to 
 """
 
 
-for module_type in kiara.available_module_types:
+for module_type in kiara.available_non_pipeline_module_types:
 
     if module_type == "pipeline":
         continue
