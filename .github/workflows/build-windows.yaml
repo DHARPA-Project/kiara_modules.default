@@ -1,0 +1,53 @@
+name: "windows tests & binary build for 'kiara_modules.default'"
+# This workflow is triggered on pushes to the repository.
+on: [push]
+
+
+jobs:
+  test-windows:
+    name: pytest on windows
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python_version: [3.6, 3.7, 3.8, 3.9]
+    steps:
+      - name: "Set up Python ${{ matrix.python_version }}"
+        uses: actions/setup-python@v2
+        with:
+          python-version: "${{ matrix.python_version }}"
+      - uses: actions/checkout@v2
+      - name: install requirements
+        run: pip install -U --extra-index-url https://pkgs.frkl.io/frkl/dev --extra-index-url https://pkgs.frkl.dev/pypi -e '.[dev_testing,all]'
+      - name: Test with pytest
+        run: make test
+
+  mypy-windows:
+    name: mypy check on windows
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python_version: [3.6, 3.7, 3.8, 3.9]
+    steps:
+      - name: "Set up Python ${{ matrix.python_version }}"
+        uses: actions/setup-python@v2
+        with:
+          python-version: "${{ matrix.python_version }}"
+      - uses: actions/checkout@v2
+      - name: install requirements
+        run: pip install -U --extra-index-url https://pkgs.frkl.io/frkl/dev --extra-index-url https://pkgs.frkl.dev/pypi -e '.[dev_testing,all]'
+      - name: Test with mypy
+        run: make mypy
+
+  flake8-windows:
+    name: flake8 on windows
+    runs-on: windows-latest
+    steps:
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - uses: actions/checkout@v2
+      - name: install requirements
+        run: pip install -U --extra-index-url https://pkgs.frkl.io/frkl/dev --extra-index-url https://pkgs.frkl.dev/pypi -e '.[dev_testing,all]'
+      - name: Test with flake8
+        run: make flake

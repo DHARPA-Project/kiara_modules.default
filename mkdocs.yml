@@ -1,0 +1,38 @@
+site_name: kiara_modules.default
+repo_url: https://gitlab.com/frkl/kiara_modules.default
+site_author: Markus Binsteiner
+docs_dir: docs
+site_dir: build/site
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tracking
+
+markdown_extensions:
+- attr_list
+- admonition
+- codehilite:
+    guess_lang: false
+- toc:
+    permalink: true
+- pymdownx.snippets:
+    base_path: docs
+
+nav:
+- Home: index.md
+- Usage: usage.md
+
+plugins:
+- search
+- mkdocstrings:
+    default_handler: python
+    watch:
+      - "src"
+- frkl-docgen:
+    main_module: "kiara_modules.default"
+- macros:
+   modules:
+     - frkl.project.meta.documentation.mkdocs_macros_frkl
+     - kiara.doc.mkdocs_macros_kiara

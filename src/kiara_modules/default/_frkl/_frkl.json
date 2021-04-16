@@ -1,0 +1,10 @@
+{
+  "project": {
+    "full_name": "Markus Binsteiner",
+    "email": "markus.binsteiner@uni.lu",
+    "project_name": "kiara_modules.default",
+    "project_slug": "kiara_modules_default",
+    "project_main_module": "kiara_modules.default",
+    "project_short_description": "A set of default modules for Kiara."
+  }
+}
