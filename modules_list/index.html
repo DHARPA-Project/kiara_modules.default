@@ -40,6 +40,12 @@
     
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="../css/ansi-colours.css">
+    
+      <link rel="stylesheet" href="../css/jupyter-cells.css">
+    
+      <link rel="stylesheet" href="../css/pandas-dataframe.css">
+    
     
       
     
@@ -259,20 +265,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#nand" class="md-nav__link">
-    nand
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#nor" class="md-nav__link">
-    nor
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#not" class="md-nav__link">
     not
   </a>
@@ -282,13 +274,6 @@
         <li class="md-nav__item">
   <a href="#or" class="md-nav__link">
     or
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#xor" class="md-nav__link">
-    xor
   </a>
   
 </li>
@@ -433,20 +418,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#nand" class="md-nav__link">
-    nand
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#nor" class="md-nav__link">
-    nor
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#not" class="md-nav__link">
     not
   </a>
@@ -456,13 +427,6 @@
         <li class="md-nav__item">
   <a href="#or" class="md-nav__link">
     or
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#xor" class="md-nav__link">
-    xor
   </a>
   
 </li>
@@ -553,96 +517,6 @@
                      outputs.set_values(**value_dict)                           
 </code></pre></div>
 
-<h2 id="nand"><code>nand</code><a class="headerlink" href="#nand" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><code>PipelineModule: nand
-
-  class               kiara.modules.pipelines.Nand                              
-
-  doc                 Returns &#39;False&#39; if both inputs are &#39;True&#39;.                
-
-  config class        kiara.config.PipelineModuleConfig                         
-
-  config               ──────────────────────────────────────────────────────   
-                        constants   object   Value constants for this           
-                                             module.                            
-                        meta        object   Metadata for this workflow.        
-                       ──────────────────────────────────────────────────────   
-
-  pipeline inputs     a:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing this input state.             
-                      b:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing this input state.             
-
-  pipeline outputs    y:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing the module output state.      
-
-  processing stages   stage 0:                                                  
-                        and:                                                    
-                          module: and                                           
-                          desc: Returns &#39;True&#39; if both inputs are &#39;True&#39;.       
-                          inputs:                                               
-                          - a ← __pipeline__.a                                  
-                          - b ← __pipeline__.b                                  
-                          outputs:                                              
-                          - y                                                   
-                      stage 1:                                                  
-                        not:                                                    
-                          module: not                                           
-                          desc: Negates the input.                              
-                          inputs:                                               
-                          - a ← and.y                                           
-                          outputs:                                              
-                          - y → __pipeline__.y                                  
-</code></pre></div>
-
-<h2 id="nor"><code>nor</code><a class="headerlink" href="#nor" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><code>PipelineModule: nor
-
-  class               kiara.modules.pipelines.Nor                               
-
-  doc                 Returns &#39;True&#39; if both inputs are &#39;False&#39;.                
-
-  config class        kiara.config.PipelineModuleConfig                         
-
-  config               ──────────────────────────────────────────────────────   
-                        constants   object   Value constants for this           
-                                             module.                            
-                        meta        object   Metadata for this workflow.        
-                       ──────────────────────────────────────────────────────   
-
-  pipeline inputs     a:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing this input state.             
-                      b:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing this input state.             
-
-  pipeline outputs    y:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing the module output state.      
-
-  processing stages   stage 0:                                                  
-                        or:                                                     
-                          module: or                                            
-                          desc: Returns &#39;True&#39; if one of the inputs is &#39;True&#39;.  
-                          inputs:                                               
-                          - a ← __pipeline__.a                                  
-                          - b ← __pipeline__.b                                  
-                          outputs:                                              
-                          - y                                                   
-                      stage 1:                                                  
-                        not:                                                    
-                          module: not                                           
-                          desc: Negates the input.                              
-                          inputs:                                               
-                          - a ← or.y                                            
-                          outputs:                                              
-                          - y → __pipeline__.y                                  
-</code></pre></div>
-
 <h2 id="not"><code>not</code><a class="headerlink" href="#not" title="Permanent link">&para;</a></h2>
 <div class="codehilite"><pre><span></span><code>Module: not
 
@@ -687,61 +561,6 @@
 
                      time.sleep(self.config.get(&quot;delay&quot;))  # type: ignore       
                      outputs.y = inputs.a or inputs.b                           
-</code></pre></div>
-
-<h2 id="xor"><code>xor</code><a class="headerlink" href="#xor" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><code>PipelineModule: xor
-
-  class               kiara.modules.pipelines.Xor                               
-
-  doc                 Returns &#39;True&#39; if exactly one of it&#39;s two inputs is       
-                      &#39;True&#39;.                                                   
-
-  config class        kiara.config.PipelineModuleConfig                         
-
-  config               ──────────────────────────────────────────────────────   
-                        constants   object   Value constants for this           
-                                             module.                            
-                        meta        object   Metadata for this workflow.        
-                       ──────────────────────────────────────────────────────   
-
-  pipeline inputs     a:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing this input state.             
-                      b:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing this input state.             
-
-  pipeline outputs    y:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing the module output state.      
-
-  processing stages   stage 0:                                                  
-                        or:                                                     
-                          module: or                                            
-                          desc: Returns &#39;True&#39; if one of the inputs is &#39;True&#39;.  
-                          inputs:                                               
-                          - a ← __pipeline__.a                                  
-                          - b ← __pipeline__.b                                  
-                          outputs:                                              
-                          - y                                                   
-                        nand:                                                   
-                          module: nand                                          
-                          desc: Returns &#39;False&#39; if both inputs are &#39;True&#39;.      
-                          inputs:                                               
-                          - a ← __pipeline__.a                                  
-                          - b ← __pipeline__.b                                  
-                          outputs:                                              
-                          - y                                                   
-                      stage 1:                                                  
-                        and:                                                    
-                          module: and                                           
-                          desc: Returns &#39;True&#39; if both inputs are &#39;True&#39;.       
-                          inputs:                                               
-                          - a ← or.y                                            
-                          - b ← nand.y                                          
-                          outputs:                                              
-                          - y → __pipeline__.y                                  
 </code></pre></div>
                 
               
