@@ -4,7 +4,7 @@ import typing
 from pydantic import Field
 
 from kiara.config import KiaraModuleConfig
-from kiara.data.values import ValueSchema, ValueType
+from kiara.data.values import ValueSchema
 from kiara.module import KiaraModule, StepInputs, StepOutputs
 
 
@@ -25,23 +25,30 @@ class LogicProcessingModule(KiaraModule):
 class NotModule(LogicProcessingModule):
     """Negates the input."""
 
-    def create_input_schema(self) -> typing.Mapping[str, ValueSchema]:
+    def create_input_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
         """The not module only has one input, a boolean that will be negated by the module."""
 
         return {
-            "a": ValueSchema(
-                type=ValueType.boolean, doc="A boolean describing this input state."
-            ),
+            "a": {"type": "boolean", "doc": "A boolean describing this input state."}
         }
 
-    def create_output_schema(self) -> typing.Mapping[str, ValueSchema]:
-        """The output of this module is a single boolean, the negated input."""
+        def create_output_schema(
+            self,
+        ) -> typing.Mapping[
+            str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+        ]:
+
+            """The output of this module is a single boolean, the negated input."""
 
         return {
-            "y": ValueSchema(
-                type=ValueType.boolean,
-                doc="A boolean describing the module output state.",
-            )
+            "y": {
+                "type": "boolean",
+                "doc": "A boolean describing the module output state.",
+            }
         }
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
@@ -55,24 +62,28 @@ class NotModule(LogicProcessingModule):
 class AndModule(LogicProcessingModule):
     """Returns 'True' if both inputs are 'True'."""
 
-    def create_input_schema(self) -> typing.Mapping[str, ValueSchema]:
+    def create_input_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
 
         return {
-            "a": ValueSchema(
-                type=ValueType.boolean, doc="A boolean describing this input state."
-            ),
-            "b": ValueSchema(
-                type=ValueType.boolean, doc="A boolean describing this input state."
-            ),
+            "a": {"type": "boolean", "doc": "A boolean describing this input state."},
+            "b": {"type": "boolean", "doc": "A boolean describing this input state."},
         }
 
-    def create_output_schema(self) -> typing.Mapping[str, ValueSchema]:
+    def create_output_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
 
         return {
-            "y": ValueSchema(
-                type=ValueType.boolean,
-                doc="A boolean describing the module output state.",
-            )
+            "y": {
+                "type": "boolean",
+                "doc": "A boolean describing the module output state.",
+            }
         }
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
@@ -85,24 +96,28 @@ class AndModule(LogicProcessingModule):
 class OrModule(LogicProcessingModule):
     """Returns 'True' if one of the inputs is 'True'."""
 
-    def create_input_schema(self) -> typing.Mapping[str, ValueSchema]:
+    def create_input_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
 
         return {
-            "a": ValueSchema(
-                type=ValueType.boolean, doc="A boolean describing this input state."
-            ),
-            "b": ValueSchema(
-                type=ValueType.boolean, doc="A boolean describing this input state."
-            ),
+            "a": {"type": "boolean", "doc": "A boolean describing this input state."},
+            "b": {"type": "boolean", "doc": "A boolean describing this input state."},
         }
 
-    def create_output_schema(self) -> typing.Mapping[str, ValueSchema]:
+    def create_output_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
 
         return {
-            "y": ValueSchema(
-                type=ValueType.boolean,
-                doc="A boolean describing the module output state.",
-            )
+            "y": {
+                "type": "boolean",
+                "doc": "A boolean describing the module output state.",
+            }
         }
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:

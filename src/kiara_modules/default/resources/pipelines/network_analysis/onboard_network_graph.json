@@ -1,0 +1,50 @@
+{
+  "module_type_name": "onboard_network_graph",
+  "doc": "Create a network graph from 2 tabular data sets.",
+  "steps": [
+    {
+      "module_type":  "import_table",
+      "step_id": "load_edges_table"
+    },
+    {
+      "module_type": "import_table",
+      "step_id": "load_nodes_table"
+    },
+    {
+      "module_type": "prepare_nodes_table_lena",
+      "step_id": "prepare_nodes_table",
+      "input_links": {
+        "table": "load_nodes_table.table"
+      }
+    },
+    {
+      "module_type":  "create_directed_graph",
+      "step_id": "create_graph",
+      "input_links": {
+        "edges_table": "load_edges_table.table",
+        "nodes_table": "prepare_nodes_table.table"
+      }
+    },
+    {
+      "module_type": "augment_network_graph",
+      "step_id": "augment_graph",
+      "input_links": {
+        "graph": "create_graph.graph",
+        "node_attributes": "prepare_nodes_table.table",
+        "index_column_name": "prepare_nodes_table.index_column_name"
+      }
+    }
+  ],
+  "input_aliases": {
+    "load_edges_table__path": "edges_path",
+    "create_graph__source_column": "source_column",
+    "create_graph__target_column": "target_column",
+    "create_graph__weight_column": "weight_column",
+    "augment_graph__nodes_attributes": "nodes_attributes",
+    "augment_graph__index_column_name": "nodes_table_index"
+  },
+  "output_aliases": {
+    "augment_graph__graph": "graph"
+  }
+}
+
