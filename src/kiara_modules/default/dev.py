@@ -70,8 +70,9 @@ class DummyModule(KiaraModule):
         value_dict = {}
         for output_name in self.output_names:
             if output_name not in output_values.keys():
-                v = self.output_schemas[output_name].type_obj.fake_value()
-                value_dict[output_name] = v
+                raise NotImplementedError()
+                # v = self.output_schemas[output_name].type_obj.fake_value()
+                # value_dict[output_name] = v
             else:
                 value_dict[output_name] = output_values[output_name]
         outputs.set_values(**value_dict)

@@ -36,13 +36,13 @@ class NotModule(LogicProcessingModule):
             "a": {"type": "boolean", "doc": "A boolean describing this input state."}
         }
 
-        def create_output_schema(
-            self,
-        ) -> typing.Mapping[
-            str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
-        ]:
+    def create_output_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
 
-            """The output of this module is a single boolean, the negated input."""
+        """The output of this module is a single boolean, the negated input."""
 
         return {
             "y": {

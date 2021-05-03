@@ -4,7 +4,10 @@
   "steps": [
     {
       "module_type":  "find_shortest_path",
-      "step_id": "find_shortest_path"
+      "step_id": "find_shortest_path",
+      "module_config": {
+        "mode": "single-pair"
+      }
     },
     {
       "module_type": "graph_properties",

@@ -4,90 +4,13 @@ import networkx as nx
 import pyarrow
 import typing
 from networkx import DiGraph, Graph
-from pydantic import Field
+from pydantic import Field, validator
 
 from kiara import KiaraModule
 from kiara.config import KiaraModuleConfig
 from kiara.data.values import ValueSchema
+from kiara.exceptions import KiaraProcessingException
 from kiara.module import StepInputs, StepOutputs
-
-# class NetworkGraphModuleConfig(KiaraModuleConfig):
-#
-#     source_column_name: str = Field(description="")
-
-
-class PrepareNodesTableLenaModule(KiaraModule):
-    """Prepare tabular data so it can be used as a 'nodes_table' input in the a directed graph module.
-
-    This is a very specific module, only accepting a very specific data format and as such only suitable as a proof-of-concept.
-    Later on, this will be replaced by a more generic module (or pipeline).
-    """
-
-    def create_input_schema(
-        self,
-    ) -> typing.Mapping[
-        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
-    ]:
-        return {"table": {"type": "table", "doc": "The 'raw' table incl. edges."}}
-
-    def create_output_schema(
-        self,
-    ) -> typing.Mapping[
-        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
-    ]:
-        return {
-            "table": {
-                "type": "table",
-                "doc": "A normalized table where every row represents the metadata for a single network node.",
-            },
-            "index_column_name": {
-                "type": "string",
-                "doc": "The name of the column that contains the node identifier.",
-            },
-        }
-
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
-
-        t: pyarrow.Table = inputs.table
-        df = t.to_pandas()
-
-        df1 = df.iloc[:, 0:11]
-        df1.columns = [
-            "Id",
-            "LabelOrig",
-            "LabelTrans",
-            "Year",
-            "Type",
-            "Language",
-            "City",
-            "CountryOld",
-            "CountryNew",
-            "Latitude",
-            "Longitude",
-        ]
-        df2 = df.iloc[
-            :, 11:
-        ]  # This slices the dataframe in half creating a df of just the TargetJournals data
-        df2.columns = [
-            "Id",
-            "Year",
-            "LabelOrig",
-            "LabelTrans",
-            "Type",
-            "Language",
-            "City",
-            "CountryOld",
-            "CountryNew",
-            "Latitude",
-            "Longitude",
-        ]
-        extr_nodes = df1.append(df2)
-        extr_nodes_unique = extr_nodes.drop_duplicates(subset=["Id"])
-
-        result = pyarrow.Table.from_pandas(extr_nodes_unique)
-        outputs.table = result
-
-        outputs.index_column_name = "Id"
 
 
 class CreateDirectedGraphModule(KiaraModule):
@@ -140,6 +63,19 @@ class CreateDirectedGraphModule(KiaraModule):
         target_column = inputs.target_column
         weight_column = inputs.weight_column
 
+        errors = []
+        if source_column not in edges_table_obj.column_names:
+            errors.append(source_column)
+        if target_column not in edges_table_obj.column_names:
+            errors.append(target_column)
+        if weight_column not in edges_table_obj.column_names:
+            errors.append(weight_column)
+
+        if errors:
+            raise KiaraProcessingException(
+                f"Can't create network graph, source table missing column(s): {', '.join(errors)}. Available columns: {', '.join(edges_table_obj.column_names)}."
+            )
+
         min_table = edges_table_obj.select(
             (source_column, target_column, weight_column)
         )
@@ -168,10 +104,12 @@ class AugmentNetworkGraphModule(KiaraModule):
             "node_attributes": {
                 "type": "table",
                 "doc": "The table containing node attributes.",
+                "required": False,
             },
             "index_column_name": {
                 "type": "string",
                 "doc": "The name of the column that contains the node index in the node attributes table.",
+                "required": False,
             },
         }
 
@@ -184,10 +122,79 @@ class AugmentNetworkGraphModule(KiaraModule):
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
 
+        nodes_table_value = inputs.get_value_obj("node_attributes")
+
+        if nodes_table_value.is_none or not nodes_table_value:
+            # we return the graph as is
+            # we are using the 'get_value_obj' method, because there is no need to retrieve the
+            # actual data at all
+            outputs.graph = inputs.get_value_obj("graph")
+            return
+
         input_graph: Graph = inputs.graph
         graph: Graph = copy.deepcopy(input_graph)
 
+        nodes_table_obj: pyarrow.Table = nodes_table_value.get_value_data()
+        nodes_table_index = inputs.index_column_name
+        if nodes_table_index not in nodes_table_obj.column_names:
+            raise KiaraProcessingException(
+                f"Node attribute table does not have a column with (index) name '{nodes_table_index}'. Available column names: {', '.join(nodes_table_obj.column_names)}"
+            )
+
+        attr_dict = (
+            nodes_table_obj.to_pandas()
+            .set_index(nodes_table_index)
+            .to_dict("index")
+            .items()
+        )
+        graph.add_nodes_from(attr_dict)
+
+        outputs.graph = graph
+
+
+class AddNodesToNetworkGraphModule(KiaraModule):
+    """Add nodes to an existing graph."""
+
+    def create_input_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
+        return {
+            "graph": {"type": "network_graph", "doc": "The network graph"},
+            "nodes": {
+                "type": "table",
+                "doc": "The table containing node attributes.",
+                "required": False,
+            },
+            "index_column_name": {
+                "type": "string",
+                "doc": "The name of the column that contains the node index in the node attributes table.",
+                "required": False,
+            },
+        }
+
+    def create_output_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
+        return {"graph": {"type": "network_graph", "doc": "The network graph"}}
+
+    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+
         nodes_table_value = inputs.get_value_obj("node_attributes")
+
+        if nodes_table_value.is_none:
+            # we return the graph as is
+            # we are using the 'get_value_obj' method, because there is no need to retrieve the
+            # actual data at all
+            outputs.graph = inputs.get_value_obj("graph")
+            return
+
+        input_graph: Graph = inputs.graph
+        graph: Graph = copy.deepcopy(input_graph)
+
         nodes_table_obj: pyarrow.Table = nodes_table_value.get_value_data()
         nodes_table_index = inputs.index_column_name
 
@@ -202,8 +209,26 @@ class AugmentNetworkGraphModule(KiaraModule):
         outputs.graph = graph
 
 
+class FindShortestPathModuleConfig(KiaraModuleConfig):
+
+    mode: str = Field(
+        description="Whether to calculate one shortest path for only one pair ('single-pair'), or use two node lists as input and select one of the following strategies: shortest path for each pair ('one-to-one'), the shortest path to all targets ('one-to-many'), or a matrix of all possible combinations ('many-to-many').",
+        default="single-pair",
+    )
+
+    @validator("mode")
+    def _validate_mode(cls, v):
+
+        allowed = ["single-pair", "one-to-one", "one-to-many", "many-to-many"]
+        if v not in allowed:
+            raise ValueError(f"'mode' must be one of: [{allowed}]")
+        return v
+
+
 class FindShortestPathModule(KiaraModule):
     """Find the shortest path between two nodes in a graph."""
+
+    _config_cls = FindShortestPathModuleConfig
 
     def create_input_schema(
         self,
@@ -211,24 +236,60 @@ class FindShortestPathModule(KiaraModule):
         str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
     ]:
 
-        return {
-            "graph": {"type": "network_graph", "doc": "The network graph"},
-            "source_node": {"type": "string", "doc": "The id of the source node."},
-            "target_node": {"type": "string", "doc": "The id of the target node."},
-        }
+        mode = self.get_config_value("mode")
+        if mode == "single-pair":
+            return {
+                "graph": {"type": "network_graph", "doc": "The network graph"},
+                "source_node": {"type": "any", "doc": "The id of the source node."},
+                "target_node": {"type": "any", "doc": "The id of the target node."},
+            }
+        else:
+            return {
+                "graph": {"type": "network_graph", "doc": "The network graph"},
+                "source_nodes": {"type": "list", "doc": "The id of the source nodes."},
+                "target_nodes": {"type": "list", "doc": "The id of the target nodes."},
+            }
 
     def create_output_schema(
         self,
     ) -> typing.Mapping[
         str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
     ]:
-        return {
-            "path": {"type": "array", "doc": "The shortest path between two nodes."}
-        }
+        mode = self.get_config_value("mode")
+        if mode == "single-pair":
+            return {
+                "path": {"type": "array", "doc": "The shortest path between two nodes."}
+            }
+        else:
+            return {
+                "paths": {
+                    "type": "table",
+                    "doc": "A table with 'source', 'target' and 'path' column.",
+                }
+            }
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
 
-        pass
+        mode = self.get_config_value("mode")
+        if mode != "single-pair":
+            raise NotImplementedError()
+
+        graph: Graph = inputs.graph
+        source: typing.Any = inputs.source_node
+        target: typing.Any = inputs.target_node
+
+        if source not in graph.nodes:
+            raise KiaraProcessingException(
+                f"Can't process shortest path, source '{source}' not in graph."
+            )
+
+        if target not in graph.nodes:
+            raise KiaraProcessingException(
+                f"Can't process shortest path, target '{target}' not in graph."
+            )
+
+        shortest_path = nx.shortest_path(graph, source=source, target=target)
+        outputs.path = shortest_path
 
 
 class ExtractGraphPropertiesModuleConfig(KiaraModuleConfig):
@@ -266,10 +327,10 @@ class ExtractGraphPropertiesModule(KiaraModule):
         if self.get_config_value("find_largest_component"):
             result["largest_component"] = {
                 "type": "network_graph",
-                "doc": "A sub-graph of just the largest component of the graph.",
+                "doc": "A sub-graph of the largest component of the graph.",
             }
             result["density_largest_component"] = {
-                "type": "integer",
+                "type": "float",
                 "doc": "The density of the largest component.",
             }
 
@@ -284,6 +345,9 @@ class ExtractGraphPropertiesModule(KiaraModule):
                 "type": "integer",
                 "doc": "The number of edges in the graph.",
             }
+
+        if self.get_config_value("density"):
+            result["density"] = {"type": "float", "doc": "The density of the graph."}
 
         return result
 
