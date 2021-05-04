@@ -1,57 +1,77 @@
 # -*- coding: utf-8 -*-
-import os
 import typing
-from pyarrow import csv
 from pydantic import Field
 
 from kiara import KiaraModule
 from kiara.config import KiaraModuleConfig
+from kiara.data.types import FileModel
 from kiara.data.values import ValueSchema
 from kiara.module import StepInputs, StepOutputs
 
 
-class ImportTableModuleConfig(KiaraModuleConfig):
+class ImportLocalPathConfig(KiaraModuleConfig):
 
-    only_columns: typing.List = Field(
-        description="If non-empty, only import the columns that match the names in this list.",
-        default_factory=list,
+    source_is_immutable: bool = Field(
+        description="Whether the data that lives in source path can be relied upon to not change, and always be available",
+        default=False,
     )
 
 
-class ImportTableModule(KiaraModule):
-    """Import table-like data from a file or fileset."""
+class ImportLocalFileModule(KiaraModule):
+    """Read a file into the data registry."""
 
-    _config_cls = ImportTableModuleConfig
+    _config_cls = ImportLocalPathConfig
 
     def create_input_schema(
         self,
     ) -> typing.Mapping[
         str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
     ]:
-
-        return {
-            "path": {
-                "type": "string",
-                "doc": "The path to a file or folder that contains tabular data.",
-            }
-        }
+        return {"path": {"type": "string", "doc": "The path to the file."}}
 
     def create_output_schema(
         self,
     ) -> typing.Mapping[
         str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
     ]:
-        return {"table": {"type": "table", "doc": "the imported table"}}
+        return {
+            "file": {
+                "type": "file",
+                "doc": "A representation of the original file content in the kiara data registry.",
+            }
+        }
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
 
         path = inputs.path
-        if not os.path.exists(path):
-            raise Exception(f"Path '{path}' does not exist")
+        file_model = FileModel.import_file(path)
+        outputs.file = file_model
 
-        imported_data = csv.read_csv(path)
 
-        if self.get_config_value("only_columns"):
-            imported_data = imported_data.select(self.get_config_value("only_columns"))
+class ImportLocalFolderModule(KiaraModule):
 
-        outputs.table = imported_data
+    _config_cls = ImportLocalPathConfig
+
+    def create_input_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
+        return {"path": {"type": "string", "doc": "The path to the folder."}}
+
+    def create_output_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
+
+        return {
+            "file_bundle": {
+                "type": "file_bundle",
+                "doc": "The collection of files contained in the folder.",
+            }
+        }
+
+    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+
+        raise NotImplementedError()

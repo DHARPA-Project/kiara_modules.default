@@ -3,7 +3,8 @@ import copy
 import networkx as nx
 import pyarrow
 import typing
-from networkx import DiGraph, Graph
+from enum import Enum
+from networkx import Graph
 from pydantic import Field, validator
 
 from kiara import KiaraModule
@@ -13,8 +14,28 @@ from kiara.exceptions import KiaraProcessingException
 from kiara.module import StepInputs, StepOutputs
 
 
-class CreateDirectedGraphModule(KiaraModule):
+class GraphTypesEnum(Enum):
+
+    undirected = "undirected"
+    directed = "directed"
+    multi_directed = "multi_directed"
+    multi_undirected = "multi_undirected"
+
+
+class CreateGraphConfig(KiaraModuleConfig):
+    class Config:
+        use_enum_values = True
+
+    graph_type: typing.Optional[GraphTypesEnum] = Field(
+        description="The type of the graph. If not specified, a 'graph_type' input field will be added which will default to 'directed'.",
+        default=None,
+    )
+
+
+class CreateGraphFromEdgesTableModule(KiaraModule):
     """Create a directed network graph object from tabular data."""
+
+    _config_cls = CreateGraphConfig
 
     def create_input_schema(
         self,
@@ -22,7 +43,7 @@ class CreateDirectedGraphModule(KiaraModule):
         str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
     ]:
 
-        return {
+        inputs = {
             "edges_table": {
                 "type": "table",
                 "doc": "The table to extract the edges from.",
@@ -44,6 +65,14 @@ class CreateDirectedGraphModule(KiaraModule):
             },
         }
 
+        if self.get_config_value("graph_type") is None:
+            inputs["graph_type"] = {
+                "type": "string",
+                "default": "directed",
+                "doc": "The type of the graph. Allowed: 'undirected', 'directed', 'multi_directed', 'multi_undirected'.",
+            }
+        return inputs
+
     def create_output_schema(
         self,
     ) -> typing.Mapping[
@@ -55,6 +84,13 @@ class CreateDirectedGraphModule(KiaraModule):
         }
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+
+        if self.get_config_value("graph_type") is not None:
+            _graph_type = self.get_config_value("graph_type")
+        else:
+            _graph_type = inputs.graph_type
+
+        graph_type = GraphTypesEnum[_graph_type]
 
         edges_table_value = inputs.get_value_obj("edges_table")
         edges_table_obj: pyarrow.Table = edges_table_value.get_value_data()
@@ -81,18 +117,22 @@ class CreateDirectedGraphModule(KiaraModule):
         )
         pandas_table = min_table.to_pandas()
 
-        graph: DiGraph = nx.from_pandas_edgelist(
+        if graph_type != GraphTypesEnum.directed:
+            raise NotImplementedError("Only 'directed' graphs supported at the moment.")
+        graph_cls = nx.DiGraph
+
+        graph: nx.DiGraph = nx.from_pandas_edgelist(
             pandas_table,
             source_column,
             target_column,
             edge_attr=True,
-            create_using=nx.DiGraph(),
+            create_using=graph_cls,
         )
         outputs.graph = graph
 
 
 class AugmentNetworkGraphModule(KiaraModule):
-    """Augment an existing graph with new node attributes."""
+    """Augment an existing graph with node attributes."""
 
     def create_input_schema(
         self,
@@ -104,12 +144,12 @@ class AugmentNetworkGraphModule(KiaraModule):
             "node_attributes": {
                 "type": "table",
                 "doc": "The table containing node attributes.",
-                "required": False,
+                "optional": True,
             },
             "index_column_name": {
                 "type": "string",
                 "doc": "The name of the column that contains the node index in the node attributes table.",
-                "required": False,
+                "optional": True,
             },
         }
 
@@ -165,12 +205,12 @@ class AddNodesToNetworkGraphModule(KiaraModule):
             "nodes": {
                 "type": "table",
                 "doc": "The table containing node attributes.",
-                "required": False,
+                "optional": True,
             },
             "index_column_name": {
                 "type": "string",
                 "doc": "The name of the column that contains the node index in the node attributes table.",
-                "required": False,
+                "optional": True,
             },
         }
 
@@ -315,7 +355,7 @@ class ExtractGraphPropertiesModule(KiaraModule):
         str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
     ]:
 
-        return {"graph": {"type": "network_graph", "doc": "The network graph"}}
+        return {"graph": {"type": "network_graph", "doc": "The network graph."}}
 
     def create_output_schema(
         self,
