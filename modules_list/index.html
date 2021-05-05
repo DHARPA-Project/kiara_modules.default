@@ -632,6 +632,8 @@
 │                                                                              │
 │   class          kiara_modules.default.network_analysis.AddNodesToNetwork…   │
 │                                                                              │
+│   is pipeline    no                                                          │
+│                                                                              │
 │   doc            Add nodes to an existing graph.                             │
 │                                                                              │
 │   source repo    kiara_modules.default.add_nodes_to_network_graph            │
@@ -677,6 +679,8 @@
 │                                                                              │
 │   class          kiara_modules.default.logic_gates.AndModule                 │
 │                                                                              │
+│   is pipeline    no                                                          │
+│                                                                              │
 │   doc            Returns &#39;True&#39; if both inputs are &#39;True&#39;.                   │
 │                                                                              │
 │   source repo    kiara_modules.default.and                                   │
@@ -703,6 +707,8 @@
 <div class="codehilite"><pre><span></span><code>╭─ Module: augment_network_graph ──────────────────────────────────────────────╮
 │                                                                              │
 │   class          kiara_modules.default.network_analysis.AugmentNetworkGra…   │
+│                                                                              │
+│   is pipeline    no                                                          │
 │                                                                              │
 │   doc            Augment an existing graph with node attributes.             │
 │                                                                              │
@@ -749,13 +755,83 @@
 </code></pre></div>
 
 <h2 id="create_graph_from_edges_table"><code>create_graph_from_edges_table</code><a class="headerlink" href="#create_graph_from_edges_table" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><code>Can&#39;t render module info: &#39;type&#39;
+<div class="codehilite"><pre><span></span><code>╭─ Module: create_graph_from_edges_table ──────────────────────────────────────╮
+│                                                                              │
+│   class          kiara_modules.default.network_analysis.CreateGraphFromEd…   │
+│                                                                              │
+│   is pipeline    no                                                          │
+│                                                                              │
+│   doc            Create a directed network graph object from tabular data.   │
+│                                                                              │
+│   source repo    kiara_modules.default.create_graph_from_edges_table         │
+│                                                                              │
+│   config class   kiara_modules.default.network_analysis.CreateGraphConfig    │
+│                                                                              │
+│   config          ───────────────────────────────────────────────────────    │
+│                    constants    object   Value constants for this            │
+│                                          module.                             │
+│                    graph_type   string   The type of the graph. If not       │
+│                                          specified, a &#39;graph_type&#39; input     │
+│                                          field will be added which will      │
+│                                          default to &#39;directed&#39;.              │
+│                   ───────────────────────────────────────────────────────    │
+│                                                                              │
+│   src            def process(self, inputs: StepInputs, outputs: StepOutpu…   │
+│                                                                              │
+│                      if self.get_config_value(&quot;graph_type&quot;) is not None:     │
+│                          _graph_type = self.get_config_value(&quot;graph_type&quot;)   │
+│                      else:                                                   │
+│                          _graph_type = inputs.graph_type                     │
+│                                                                              │
+│                      graph_type = GraphTypesEnum[_graph_type]                │
+│                                                                              │
+│                      edges_table_value = inputs.get_value_obj(&quot;edges_tabl…   │
+│                      edges_table_obj: pyarrow.Table = edges_table_value.g…   │
+│                                                                              │
+│                      source_column = inputs.source_column                    │
+│                      target_column = inputs.target_column                    │
+│                      weight_column = inputs.weight_column                    │
+│                                                                              │
+│                      errors = []                                             │
+│                      if source_column not in edges_table_obj.column_names:   │
+│                          errors.append(source_column)                        │
+│                      if target_column not in edges_table_obj.column_names:   │
+│                          errors.append(target_column)                        │
+│                      if weight_column not in edges_table_obj.column_names:   │
+│                          errors.append(weight_column)                        │
+│                                                                              │
+│                      if errors:                                              │
+│                          raise KiaraProcessingException(                     │
+│                              f&quot;Can&#39;t create network graph, source table m…   │
+│                          )                                                   │
+│                                                                              │
+│                      min_table = edges_table_obj.select(                     │
+│                          (source_column, target_column, weight_column)       │
+│                      )                                                       │
+│                      pandas_table = min_table.to_pandas()                    │
+│                                                                              │
+│                      if graph_type != GraphTypesEnum.directed:               │
+│                          raise NotImplementedError(&quot;Only &#39;directed&#39; graph…   │
+│                      graph_cls = nx.DiGraph                                  │
+│                                                                              │
+│                      graph: nx.DiGraph = nx.from_pandas_edgelist(            │
+│                          pandas_table,                                       │
+│                          source_column,                                      │
+│                          target_column,                                      │
+│                          edge_attr=True,                                     │
+│                          create_using=graph_cls,                             │
+│                      )                                                       │
+│                      outputs.graph = graph                                   │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
 </code></pre></div>
 
 <h2 id="create_table"><code>create_table</code><a class="headerlink" href="#create_table" title="Permanent link">&para;</a></h2>
 <div class="codehilite"><pre><span></span><code>╭─ Module: create_table ───────────────────────────────────────────────────────╮
 │                                                                              │
 │   class          kiara_modules.default.tabular_data.CreateTableModule        │
+│                                                                              │
+│   is pipeline    no                                                          │
 │                                                                              │
 │   doc            Import table-like data from an item in the data registry.   │
 │                                                                              │
@@ -775,8 +851,6 @@
 │                                                                              │
 │                      input_file: FileModel = inputs.file                     │
 │                                                                              │
-│                      print(input_file)                                       │
-│                                                                              │
 │                      imported_data = csv.read_csv(input_file.path)           │
 │                                                                              │
 │                      if self.get_config_value(&quot;allow_column_filter&quot;):        │
@@ -794,6 +868,8 @@
 <div class="codehilite"><pre><span></span><code>╭─ Module: dummy ──────────────────────────────────────────────────────────────╮
 │                                                                              │
 │   class          kiara_modules.default.dev.DummyModule                       │
+│                                                                              │
+│   is pipeline    no                                                          │
 │                                                                              │
 │   doc            Module that simulates processing, but uses hard-coded       │
 │                  outputs as a result.                                        │
@@ -846,6 +922,8 @@
 │                                                                              │
 │   class          kiara_modules.default.network_analysis.FindShortestPathM…   │
 │                                                                              │
+│   is pipeline    no                                                          │
+│                                                                              │
 │   doc            Find the shortest path between two nodes in a graph.        │
 │                                                                              │
 │   source repo    kiara_modules.default.find_shortest_path                    │
@@ -897,6 +975,8 @@
 <div class="codehilite"><pre><span></span><code>╭─ Module: graph_properties ───────────────────────────────────────────────────╮
 │                                                                              │
 │   class          kiara_modules.default.network_analysis.ExtractGraphPrope…   │
+│                                                                              │
+│   is pipeline    no                                                          │
 │                                                                              │
 │   doc            Extract inherent properties of a network graph.             │
 │                                                                              │
@@ -951,6 +1031,8 @@
 │                                                                              │
 │   class          kiara_modules.default.data_onboarding.ImportLocalFileMod…   │
 │                                                                              │
+│   is pipeline    no                                                          │
+│                                                                              │
 │   doc            Read a file into the data registry.                         │
 │                                                                              │
 │   source repo    kiara_modules.default.import_local_file                     │
@@ -981,6 +1063,8 @@
 │                                                                              │
 │   class          kiara_modules.default.data_onboarding.ImportLocalFolderM…   │
 │                                                                              │
+│   is pipeline    no                                                          │
+│                                                                              │
 │   doc            -- n/a --                                                   │
 │                                                                              │
 │   source repo    kiara_modules.default.import_local_folder                   │
@@ -1008,6 +1092,8 @@
 <div class="codehilite"><pre><span></span><code>╭─ Module: not ────────────────────────────────────────────────────────────────╮
 │                                                                              │
 │   class          kiara_modules.default.logic_gates.NotModule                 │
+│                                                                              │
+│   is pipeline    no                                                          │
 │                                                                              │
 │   doc            Negates the input.                                          │
 │                                                                              │
@@ -1037,6 +1123,8 @@
 │                                                                              │
 │   class          kiara_modules.default.logic_gates.OrModule                  │
 │                                                                              │
+│   is pipeline    no                                                          │
+│                                                                              │
 │   doc            Returns &#39;True&#39; if one of the inputs is &#39;True&#39;.              │
 │                                                                              │
 │   source repo    kiara_modules.default.or                                    │
@@ -1062,6 +1150,8 @@
 <div class="codehilite"><pre><span></span><code>╭─ Module: prepare_nodes_table_lena ───────────────────────────────────────────╮
 │                                                                              │
 │   class          kiara_modules.default.scratchpad.PrepareNodesTableLenaMo…   │
+│                                                                              │
+│   is pipeline    no                                                          │
 │                                                                              │
 │   doc            Prepare tabular data so it can be used as a &#39;nodes_table&#39;   │
 │                  input in the a directed graph module.                       │
