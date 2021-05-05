@@ -30,51 +30,37 @@
   ],
   "additionalProperties": false,
   "definitions": {
-    "ValueType": {
-      "title": "ValueType",
-      "description": "Supported value types.\n\nIt's very early days, so this does not really do anything yet.",
-      "enum": [
-        "any",
-        "integer",
-        "string",
-        "dict",
-        "boolean",
-        "table",
-        "value_items"
-      ]
-    },
     "ValueSchema": {
       "title": "ValueSchema",
-      "description": "The schema of a value.\n\nThe schema contains the [ValueType][kiara.data.values.ValueType] of a value, as well as an optional default that\nwill be used if no user input was given (yet) for a value.\n\nFor more complex types like arrays and tables, a sub-schema will be available (e.g. columns of a table, type of\nthe array-items, ...). This bit is not implemented yet.",
+      "description": "The schema of a value.\n\nThe schema contains the [ValueType][kiara.data.values.ValueType] of a value, as well as an optional default that\nwill be used if no user input was given (yet) for a value.\n\nFor more complex container types like arrays, tables, unions etc, types can also be configured with values from the ``type_config`` field.",
       "type": "object",
       "properties": {
         "type": {
-          "$ref": "#/definitions/ValueType"
+          "title": "Type",
+          "description": "The type of the value.",
+          "type": "string"
+        },
+        "type_config": {
+          "title": "Type Config",
+          "description": "Configuration for the type, in case it's complex.",
+          "type": "object"
+        },
+        "default": {
+          "title": "Default",
+          "description": "A default value.",
+          "default": "__not_set__"
+        },
+        "optional": {
+          "title": "Optional",
+          "description": "Whether this value is required (True), or whether 'None' value is allowed (False).",
+          "default": false,
+          "type": "boolean"
         },
         "doc": {
           "title": "Doc",
           "description": "A description for the value of this input field.",
           "default": "-- n/a --",
           "type": "string"
-        },
-        "default": {
-          "title": "Default",
-          "description": "A default value."
-        },
-        "sub_schema": {
-          "title": "Sub Schema",
-          "description": "In case this schemas type is a container type (list, dict, ...), this field specifies the schema of its content.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/ValueSchema"
-            },
-            {
-              "type": "object",
-              "additionalProperties": {
-                "$ref": "#/definitions/ValueSchema"
-              }
-            }
-          ]
         }
       },
       "required": [

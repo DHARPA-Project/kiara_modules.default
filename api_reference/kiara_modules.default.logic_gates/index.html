@@ -12,15 +12,15 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.1">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.3">
     
     
       
-        <title>kiara_modules.default.logic_gates - kiara_modules.default</title>
+        <title>➜ logic_gates - kiara_modules.default</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.9299cb39.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.e35208c4.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ef6f36e2.min.css">
@@ -69,7 +69,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#kiara_modules.default.logic_gates" class="md-skip">
+        <a href="#kiara_modulesdefaultlogic_gates" class="md-skip">
           Skip to content
         </a>
       
@@ -99,7 +99,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              kiara_modules.default.logic_gates
+              ➜ logic_gates
             
           </span>
         </div>
@@ -285,8 +285,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../kiara_modules.default.data_onboarding/" class="md-nav__link">
+        ➜ data_onboarding
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../kiara_modules.default.defaults/" class="md-nav__link">
-        kiara_modules.default.defaults
+        ➜ defaults
       </a>
     </li>
   
@@ -298,7 +310,7 @@
   
     <li class="md-nav__item">
       <a href="../kiara_modules.default.dev/" class="md-nav__link">
-        kiara_modules.default.dev
+        ➜ dev
       </a>
     </li>
   
@@ -315,18 +327,24 @@
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
       
+        
+      
+      
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          kiara_modules.default.logic_gates
+          ➜ logic_gates
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        kiara_modules.default.logic_gates
+        ➜ logic_gates
       </a>
       
         
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
+  
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
@@ -472,6 +490,42 @@
   
 
           
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kiara_modules.default.network_analysis/" class="md-nav__link">
+        ➜ network_analysis
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kiara_modules.default.scratchpad/" class="md-nav__link">
+        ➜ scratchpad
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kiara_modules.default.tabular_data/" class="md-nav__link">
+        ➜ tabular_data
+      </a>
+    </li>
+  
+
+          
         </ul>
       </nav>
     </li>
@@ -492,6 +546,9 @@
                     
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
+  
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
@@ -646,9 +703,10 @@
                   </a>
                 
                 
-                  <h1>kiara_modules.default.logic_gates</h1>
-                
-                <div class="doc doc-object doc-module">
+                <h1 id="kiara_modulesdefaultlogic_gates">kiara_modules.default.logic_gates<a class="headerlink" href="#kiara_modulesdefaultlogic_gates" title="Permanent link">&para;</a></h1>
+
+
+  <div class="doc doc-object doc-module">
 
 <a id="kiara_modules.default.logic_gates"></a>
     <div class="doc doc-contents first">
@@ -708,15 +766,15 @@
 
         <details class="quote">
           <summary>Source code in <code>default/logic_gates.py</code></summary>
-          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">create_input_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ValueSchema</span><span class="p">]:</span>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">create_input_schema</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span>
+    <span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">ValueSchema</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span>
+<span class="p">]:</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">ValueSchema</span><span class="p">(</span>
-            <span class="nb">type</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">boolean</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;A boolean describing this input state.&quot;</span>
-        <span class="p">),</span>
-        <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">ValueSchema</span><span class="p">(</span>
-            <span class="nb">type</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">boolean</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;A boolean describing this input state.&quot;</span>
-        <span class="p">),</span>
+        <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;doc&quot;</span><span class="p">:</span> <span class="s2">&quot;A boolean describing this input state.&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;doc&quot;</span><span class="p">:</span> <span class="s2">&quot;A boolean describing this input state.&quot;</span><span class="p">},</span>
     <span class="p">}</span>
 </code></pre></div>
         </details>
@@ -742,13 +800,17 @@
 
         <details class="quote">
           <summary>Source code in <code>default/logic_gates.py</code></summary>
-          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">create_output_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ValueSchema</span><span class="p">]:</span>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">create_output_schema</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span>
+    <span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">ValueSchema</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span>
+<span class="p">]:</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">ValueSchema</span><span class="p">(</span>
-            <span class="nb">type</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">boolean</span><span class="p">,</span>
-            <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;A boolean describing the module output state.&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;doc&quot;</span><span class="p">:</span> <span class="s2">&quot;A boolean describing the module output state.&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
     <span class="p">}</span>
 </code></pre></div>
         </details>
@@ -933,13 +995,15 @@
 
         <details class="quote">
           <summary>Source code in <code>default/logic_gates.py</code></summary>
-          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">create_input_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ValueSchema</span><span class="p">]:</span>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">create_input_schema</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span>
+    <span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">ValueSchema</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span>
+<span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;The not module only has one input, a boolean that will be negated by the module.&quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">ValueSchema</span><span class="p">(</span>
-            <span class="nb">type</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">boolean</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;A boolean describing this input state.&quot;</span>
-        <span class="p">),</span>
+        <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;doc&quot;</span><span class="p">:</span> <span class="s2">&quot;A boolean describing this input state.&quot;</span><span class="p">}</span>
     <span class="p">}</span>
 </code></pre></div>
         </details>
@@ -965,14 +1029,19 @@
 
         <details class="quote">
           <summary>Source code in <code>default/logic_gates.py</code></summary>
-          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">create_output_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ValueSchema</span><span class="p">]:</span>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">create_output_schema</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span>
+    <span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">ValueSchema</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span>
+<span class="p">]:</span>
+
     <span class="sd">&quot;&quot;&quot;The output of this module is a single boolean, the negated input.&quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">ValueSchema</span><span class="p">(</span>
-            <span class="nb">type</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">boolean</span><span class="p">,</span>
-            <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;A boolean describing the module output state.&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;doc&quot;</span><span class="p">:</span> <span class="s2">&quot;A boolean describing the module output state.&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
     <span class="p">}</span>
 </code></pre></div>
         </details>
@@ -1066,15 +1135,15 @@
 
         <details class="quote">
           <summary>Source code in <code>default/logic_gates.py</code></summary>
-          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">create_input_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ValueSchema</span><span class="p">]:</span>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">create_input_schema</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span>
+    <span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">ValueSchema</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span>
+<span class="p">]:</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">ValueSchema</span><span class="p">(</span>
-            <span class="nb">type</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">boolean</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;A boolean describing this input state.&quot;</span>
-        <span class="p">),</span>
-        <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">ValueSchema</span><span class="p">(</span>
-            <span class="nb">type</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">boolean</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;A boolean describing this input state.&quot;</span>
-        <span class="p">),</span>
+        <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;doc&quot;</span><span class="p">:</span> <span class="s2">&quot;A boolean describing this input state.&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;doc&quot;</span><span class="p">:</span> <span class="s2">&quot;A boolean describing this input state.&quot;</span><span class="p">},</span>
     <span class="p">}</span>
 </code></pre></div>
         </details>
@@ -1100,13 +1169,17 @@
 
         <details class="quote">
           <summary>Source code in <code>default/logic_gates.py</code></summary>
-          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">create_output_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ValueSchema</span><span class="p">]:</span>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">create_output_schema</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span>
+    <span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">ValueSchema</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span>
+<span class="p">]:</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">ValueSchema</span><span class="p">(</span>
-            <span class="nb">type</span><span class="o">=</span><span class="n">ValueType</span><span class="o">.</span><span class="n">boolean</span><span class="p">,</span>
-            <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;A boolean describing the module output state.&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;doc&quot;</span><span class="p">:</span> <span class="s2">&quot;A boolean describing the module output state.&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
     <span class="p">}</span>
 </code></pre></div>
         </details>
@@ -1217,11 +1290,25 @@
               <span class="md-footer__direction">
                 Previous
               </span>
-              kiara_modules.default.dev
+              ➜ dev
             </div>
           </div>
         </a>
       
+      
+        <a href="../kiara_modules.default.network_analysis/" class="md-footer__link md-footer__link--next" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              ➜ network_analysis
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
       
     </nav>
   
@@ -1247,7 +1334,7 @@
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.fe42c31b.min.js", "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.7353b375.min.js"></script>
+      <script src="../../assets/javascripts/bundle.4ea5477f.min.js"></script>
       
     
   </body>

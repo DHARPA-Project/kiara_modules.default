@@ -30,6 +30,13 @@
         }
       ]
     },
+    "step_states": {
+      "description": "The status of each step.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/StepStatus"
+      }
+    },
     "step_inputs": {
       "title": "Step Inputs",
       "description": "The current (internal) input values of each step of this pipeline.",
@@ -59,6 +66,7 @@
     "structure",
     "pipeline_inputs",
     "pipeline_outputs",
+    "step_states",
     "step_inputs",
     "step_outputs",
     "status"
@@ -114,6 +122,12 @@
           "description": "The module config.",
           "type": "object"
         },
+        "required": {
+          "title": "Required",
+          "description": "Whether this step is required within the workflow.\n\nIn some cases, when none of the pipeline outputs have a required input that connects to a step, then it is not necessary for this step to have been executed, even if it is placed before a step in the execution hierarchy. This also means that the pipeline inputs that are connected to this step might not be required.",
+          "default": true,
+          "type": "boolean"
+        },
         "processing_stage": {
           "title": "Processing Stage",
           "description": "The stage number this step is executed within the pipeline.",
@@ -159,7 +173,7 @@
         },
         "input_connections": {
           "title": "Input Connections",
-          "description": "A map that explains what elements connect to this steps inputs. A connection could either be a Pipeline input (indicated by the '__pipeline__' token), or another steps output.",
+          "description": "A map that explains what elements connect to this steps inputs. A connection could either be a Pipeline input (indicated by the ``__pipeline__`` token), or another steps output.\n\nExample:\n``` json\ninput_connections: {\n    \"a\": [\"__pipeline__.a\"],\n    \"b\": [\"step_one.a\"]\n}\n\n```\n        ",
           "type": "object",
           "additionalProperties": {
             "type": "array",
@@ -178,13 +192,122 @@
               "type": "string"
             }
           }
+        },
+        "required": {
+          "title": "Required",
+          "description": "Whether this step is always required, or potentially could be skipped in case some inputs are not available.",
+          "type": "boolean"
         }
       },
       "required": [
         "step",
         "processing_stage",
         "input_connections",
-        "output_connections"
+        "output_connections",
+        "required"
+      ],
+      "additionalProperties": false
+    },
+    "ValueSchema": {
+      "title": "ValueSchema",
+      "description": "The schema of a value.\n\nThe schema contains the [ValueType][kiara.data.values.ValueType] of a value, as well as an optional default that\nwill be used if no user input was given (yet) for a value.\n\nFor more complex container types like arrays, tables, unions etc, types can also be configured with values from the ``type_config`` field.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "title": "Type",
+          "description": "The type of the value.",
+          "type": "string"
+        },
+        "type_config": {
+          "title": "Type Config",
+          "description": "Configuration for the type, in case it's complex.",
+          "type": "object"
+        },
+        "default": {
+          "title": "Default",
+          "description": "A default value.",
+          "default": "__not_set__"
+        },
+        "optional": {
+          "title": "Optional",
+          "description": "Whether this value is required (True), or whether 'None' value is allowed (False).",
+          "default": false,
+          "type": "boolean"
+        },
+        "doc": {
+          "title": "Doc",
+          "description": "A description for the value of this input field.",
+          "default": "-- n/a --",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "PipelineInputField": {
+      "title": "PipelineInputField",
+      "description": "An input to a pipeline.",
+      "type": "object",
+      "properties": {
+        "value_name": {
+          "title": "Value Name",
+          "type": "string"
+        },
+        "value_schema": {
+          "$ref": "#/definitions/ValueSchema"
+        },
+        "pipeline_id": {
+          "title": "Pipeline Id",
+          "type": "string"
+        },
+        "connected_inputs": {
+          "title": "Connected Inputs",
+          "description": "The step inputs that are connected to this pipeline input",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StepValueAddress"
+          }
+        }
+      },
+      "required": [
+        "value_name",
+        "value_schema",
+        "pipeline_id"
+      ],
+      "additionalProperties": false
+    },
+    "PipelineOutputField": {
+      "title": "PipelineOutputField",
+      "description": "An output to a pipeline.",
+      "type": "object",
+      "properties": {
+        "value_name": {
+          "title": "Value Name",
+          "type": "string"
+        },
+        "value_schema": {
+          "$ref": "#/definitions/ValueSchema"
+        },
+        "pipeline_id": {
+          "title": "Pipeline Id",
+          "type": "string"
+        },
+        "connected_output": {
+          "title": "Connected Output",
+          "description": "Connected step outputs.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/StepValueAddress"
+            }
+          ]
+        }
+      },
+      "required": [
+        "value_name",
+        "value_schema",
+        "pipeline_id",
+        "connected_output"
       ],
       "additionalProperties": false
     },
@@ -235,6 +358,22 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "pipeline_inputs": {
+          "title": "Pipeline Inputs",
+          "description": "The pipeline inputs.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/PipelineInputField"
+          }
+        },
+        "pipeline_outputs": {
+          "title": "Pipeline Outputs",
+          "description": "The pipeline outputs.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/PipelineOutputField"
+          }
         }
       },
       "required": [
@@ -242,60 +381,11 @@
         "steps",
         "processing_stages",
         "pipeline_input_connections",
-        "pipeline_output_connections"
+        "pipeline_output_connections",
+        "pipeline_inputs",
+        "pipeline_outputs"
       ],
       "additionalProperties": false
-    },
-    "ValueType": {
-      "title": "ValueType",
-      "description": "Supported value types.\n\nIt's very early days, so this does not really do anything yet.",
-      "enum": [
-        "any",
-        "integer",
-        "string",
-        "dict",
-        "boolean",
-        "table",
-        "value_items"
-      ]
-    },
-    "ValueSchema": {
-      "title": "ValueSchema",
-      "description": "The schema of a value.\n\nThe schema contains the [ValueType][kiara.data.values.ValueType] of a value, as well as an optional default that\nwill be used if no user input was given (yet) for a value.\n\nFor more complex types like arrays and tables, a sub-schema will be available (e.g. columns of a table, type of\nthe array-items, ...). This bit is not implemented yet.",
-      "type": "object",
-      "properties": {
-        "type": {
-          "$ref": "#/definitions/ValueType"
-        },
-        "doc": {
-          "title": "Doc",
-          "description": "A description for the value of this input field.",
-          "default": "-- n/a --",
-          "type": "string"
-        },
-        "default": {
-          "title": "Default",
-          "description": "A default value."
-        },
-        "sub_schema": {
-          "title": "Sub Schema",
-          "description": "In case this schemas type is a container type (list, dict, ...), this field specifies the schema of its content.",
-          "anyOf": [
-            {
-              "$ref": "#/definitions/ValueSchema"
-            },
-            {
-              "type": "object",
-              "additionalProperties": {
-                "$ref": "#/definitions/ValueSchema"
-              }
-            }
-          ]
-        }
-      },
-      "required": [
-        "type"
-      ]
     },
     "PipelineValue": {
       "title": "PipelineValue",
@@ -311,6 +401,11 @@
           "title": "Is Valid",
           "description": "Whether the value is set and valid.",
           "default": false,
+          "type": "boolean"
+        },
+        "is_set": {
+          "title": "Is Set",
+          "description": "Whether the value is set.",
           "type": "boolean"
         },
         "value_schema": {
@@ -354,6 +449,7 @@
       },
       "required": [
         "id",
+        "is_set",
         "value_schema"
       ],
       "additionalProperties": false

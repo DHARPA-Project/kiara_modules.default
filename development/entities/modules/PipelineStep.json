@@ -21,6 +21,12 @@
       "description": "The module config.",
       "type": "object"
     },
+    "required": {
+      "title": "Required",
+      "description": "Whether this step is required within the workflow.\n\nIn some cases, when none of the pipeline outputs have a required input that connects to a step, then it is not necessary for this step to have been executed, even if it is placed before a step in the execution hierarchy. This also means that the pipeline inputs that are connected to this step might not be required.",
+      "default": true,
+      "type": "boolean"
+    },
     "processing_stage": {
       "title": "Processing Stage",
       "description": "The stage number this step is executed within the pipeline.",

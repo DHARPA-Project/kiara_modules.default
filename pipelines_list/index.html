@@ -12,7 +12,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.1">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.3">
     
     
       
@@ -20,7 +20,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.9299cb39.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.e35208c4.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ef6f36e2.min.css">
@@ -240,6 +240,7 @@
       
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
+      
         
       
       
@@ -256,6 +257,7 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+  
     
   
   
@@ -266,8 +268,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#create_network_graph" class="md-nav__link">
+    create_network_graph
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#nand" class="md-nav__link">
     nand
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#network_analysis" class="md-nav__link">
+    network_analysis
   </a>
   
 </li>
@@ -335,8 +351,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../api_reference/kiara_modules.default.data_onboarding/" class="md-nav__link">
+        ➜ data_onboarding
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../api_reference/kiara_modules.default.defaults/" class="md-nav__link">
-        kiara_modules.default.defaults
+        ➜ defaults
       </a>
     </li>
   
@@ -348,7 +376,7 @@
   
     <li class="md-nav__item">
       <a href="../api_reference/kiara_modules.default.dev/" class="md-nav__link">
-        kiara_modules.default.dev
+        ➜ dev
       </a>
     </li>
   
@@ -360,7 +388,43 @@
   
     <li class="md-nav__item">
       <a href="../api_reference/kiara_modules.default.logic_gates/" class="md-nav__link">
-        kiara_modules.default.logic_gates
+        ➜ logic_gates
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api_reference/kiara_modules.default.network_analysis/" class="md-nav__link">
+        ➜ network_analysis
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api_reference/kiara_modules.default.scratchpad/" class="md-nav__link">
+        ➜ scratchpad
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api_reference/kiara_modules.default.tabular_data/" class="md-nav__link">
+        ➜ tabular_data
       </a>
     </li>
   
@@ -387,6 +451,7 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+  
     
   
   
@@ -397,8 +462,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#create_network_graph" class="md-nav__link">
+    create_network_graph
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#nand" class="md-nav__link">
     nand
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#network_analysis" class="md-nav__link">
+    network_analysis
   </a>
   
 </li>
@@ -436,149 +515,370 @@
 <p class="admonition-title">Note</p>
 </div>
 <p>The formatting here will be improved later on, for now this should be enough to get the important details of each module type.</p>
+<h2 id="create_network_graph"><code>create_network_graph</code><a class="headerlink" href="#create_network_graph" title="Permanent link">&para;</a></h2>
+<div class="codehilite"><pre><span></span><code>╭─ Module: create_network_graph ───────────────────────────────────────────────╮
+│                                                                              │
+│   class          kiara.modules.pipelines.CreateNetworkGraph                  │
+│                                                                              │
+│   doc            Create a network graph from 2 tabular data sets: one that   │
+│                  contains the edges, one that contains node attributes       │
+│                                                                              │
+│   source repo    -- n/a --                                                   │
+│                                                                              │
+│   config class   kiara.config.PipelineModuleConfig                           │
+│                                                                              │
+│   config          ───────────────────────────────────────────────────────    │
+│                    constants        object   Value constants for this        │
+│                                              module.                         │
+│                    steps            array    A list of steps/modules of      │
+│                                              this pipeline, and their        │
+│                                              connections.                    │
+│                    input_aliases    object   A map of input aliases,         │
+│                                              with the calculated             │
+│                                              (&lt;step_id&gt;__&lt;input_name&gt; --     │
+│                                              double underscore!) name as     │
+│                                              key, and a string (the          │
+│                                              resulting workflow input        │
+│                                              alias) as value.                │
+│                    output_aliases   object   A map of output aliases,        │
+│                                              with the calculated             │
+│                                              (&lt;step_id&gt;__&lt;output_name&gt;       │
+│                                              -- double underscore!) name     │
+│                                              as key, and a string (the       │
+│                                              resulting workflow output       │
+│                                              alias) as value.                │
+│                    doc              string   Documentation about what        │
+│                                              the pipeline does.              │
+│                    meta             object   Metadata for this workflow.     │
+│                   ───────────────────────────────────────────────────────    │
+│                                                                              │
+│   src            constants: {}                                               │
+│                  steps:                                                      │
+│                  - module_type: import_local_file                            │
+│                    step_id: read_edges_file                                  │
+│                    module_config: {}                                         │
+│                    input_links: {}                                           │
+│                  - module_type: import_local_file                            │
+│                    step_id: read_nodes_file                                  │
+│                    module_config: {}                                         │
+│                    input_links: {}                                           │
+│                  - module_type: create_table                                 │
+│                    step_id: load_edges_table                                 │
+│                    module_config: {}                                         │
+│                    input_links:                                              │
+│                      file:                                                   │
+│                      - step_id: read_edges_file                              │
+│                        value_name: file                                      │
+│                        sub_value:                                            │
+│                  - module_type: create_table                                 │
+│                    step_id: load_nodes_table                                 │
+│                    module_config: {}                                         │
+│                    input_links:                                              │
+│                      file:                                                   │
+│                      - step_id: read_nodes_file                              │
+│                        value_name: file                                      │
+│                        sub_value:                                            │
+│                  - module_type: create_graph_from_edges_table                │
+│                    step_id: create_graph                                     │
+│                    module_config: {}                                         │
+│                    input_links:                                              │
+│                      edges_table:                                            │
+│                      - step_id: load_edges_table                             │
+│                        value_name: table                                     │
+│                        sub_value:                                            │
+│                  - module_type: augment_network_graph                        │
+│                    step_id: augment_graph                                    │
+│                    module_config: {}                                         │
+│                    input_links:                                              │
+│                      graph:                                                  │
+│                      - step_id: create_graph                                 │
+│                        value_name: graph                                     │
+│                        sub_value:                                            │
+│                      node_attributes:                                        │
+│                      - step_id: load_nodes_table                             │
+│                        value_name: table                                     │
+│                        sub_value:                                            │
+│                  input_aliases:                                              │
+│                    read_edges_file__path: edges_path                         │
+│                    read_nodes_file__path: nodes_path                         │
+│                    create_graph__source_column: source_column                │
+│                    create_graph__target_column: target_column                │
+│                    create_graph__weight_column: weight_column                │
+│                    create_graph__graph_type: graph_type                      │
+│                    augment_graph__nodes_attributes: nodes_attributes         │
+│                    augment_graph__index_column_name: nodes_table_index       │
+│                  output_aliases:                                             │
+│                    augment_graph__graph: graph                               │
+│                  doc: &#39;Create a network graph from 2 tabular data sets: o…   │
+│                    one that contains node attributes&#39;                        │
+│                  meta: {}                                                    │
+│                  module_type_name: create_network_graph                      │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+</code></pre></div>
+
 <h2 id="nand"><code>nand</code><a class="headerlink" href="#nand" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><code>PipelineModule: nand
+<div class="codehilite"><pre><span></span><code>╭─ Module: nand ───────────────────────────────────────────────────────────────╮
+│                                                                              │
+│   class          kiara.modules.pipelines.Nand                                │
+│                                                                              │
+│   doc            Returns &#39;False&#39; if both inputs are &#39;True&#39;.                  │
+│                                                                              │
+│   source repo    -- n/a --                                                   │
+│                                                                              │
+│   config class   kiara.config.PipelineModuleConfig                           │
+│                                                                              │
+│   config          ───────────────────────────────────────────────────────    │
+│                    constants        object   Value constants for this        │
+│                                              module.                         │
+│                    steps            array    A list of steps/modules of      │
+│                                              this pipeline, and their        │
+│                                              connections.                    │
+│                    input_aliases    object   A map of input aliases,         │
+│                                              with the calculated             │
+│                                              (&lt;step_id&gt;__&lt;input_name&gt; --     │
+│                                              double underscore!) name as     │
+│                                              key, and a string (the          │
+│                                              resulting workflow input        │
+│                                              alias) as value.                │
+│                    output_aliases   object   A map of output aliases,        │
+│                                              with the calculated             │
+│                                              (&lt;step_id&gt;__&lt;output_name&gt;       │
+│                                              -- double underscore!) name     │
+│                                              as key, and a string (the       │
+│                                              resulting workflow output       │
+│                                              alias) as value.                │
+│                    doc              string   Documentation about what        │
+│                                              the pipeline does.              │
+│                    meta             object   Metadata for this workflow.     │
+│                   ───────────────────────────────────────────────────────    │
+│                                                                              │
+│   src            constants: {}                                               │
+│                  steps:                                                      │
+│                  - module_type: and                                          │
+│                    step_id: and                                              │
+│                    module_config: {}                                         │
+│                    input_links: {}                                           │
+│                  - module_type: not                                          │
+│                    step_id: not                                              │
+│                    module_config: {}                                         │
+│                    input_links:                                              │
+│                      a:                                                      │
+│                      - step_id: and                                          │
+│                        value_name: y                                         │
+│                        sub_value:                                            │
+│                  input_aliases:                                              │
+│                    and__a: a                                                 │
+│                    and__b: b                                                 │
+│                  output_aliases:                                             │
+│                    not__y: y                                                 │
+│                  doc: Returns &#39;False&#39; if both inputs are &#39;True&#39;.             │
+│                  meta: {}                                                    │
+│                  module_type_name: nand                                      │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+</code></pre></div>
 
-  class               kiara.modules.pipelines.Nand                              
-
-  doc                 Returns &#39;False&#39; if both inputs are &#39;True&#39;.                
-
-  config class        kiara.config.PipelineModuleConfig                         
-
-  config               ──────────────────────────────────────────────────────   
-                        constants   object   Value constants for this           
-                                             module.                            
-                        meta        object   Metadata for this workflow.        
-                       ──────────────────────────────────────────────────────   
-
-  pipeline inputs     a:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing this input state.             
-                      b:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing this input state.             
-
-  pipeline outputs    y:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing the module output state.      
-
-  processing stages   stage 0:                                                  
-                        and:                                                    
-                          module: and                                           
-                          desc: Returns &#39;True&#39; if both inputs are &#39;True&#39;.       
-                          inputs:                                               
-                          - a ← __pipeline__.a                                  
-                          - b ← __pipeline__.b                                  
-                          outputs:                                              
-                          - y                                                   
-                      stage 1:                                                  
-                        not:                                                    
-                          module: not                                           
-                          desc: Negates the input.                              
-                          inputs:                                               
-                          - a ← and.y                                           
-                          outputs:                                              
-                          - y → __pipeline__.y                                  
+<h2 id="network_analysis"><code>network_analysis</code><a class="headerlink" href="#network_analysis" title="Permanent link">&para;</a></h2>
+<div class="codehilite"><pre><span></span><code>╭─ Module: network_analysis ───────────────────────────────────────────────────╮
+│                                                                              │
+│   class          kiara.modules.pipelines.NetworkAnalysis                     │
+│                                                                              │
+│   doc            First iteration of a network analysis pipeline. This        │
+│                  doesn&#39;t do much yet.                                        │
+│                                                                              │
+│   source repo    -- n/a --                                                   │
+│                                                                              │
+│   config class   kiara.config.PipelineModuleConfig                           │
+│                                                                              │
+│   config          ───────────────────────────────────────────────────────    │
+│                    constants        object   Value constants for this        │
+│                                              module.                         │
+│                    steps            array    A list of steps/modules of      │
+│                                              this pipeline, and their        │
+│                                              connections.                    │
+│                    input_aliases    object   A map of input aliases,         │
+│                                              with the calculated             │
+│                                              (&lt;step_id&gt;__&lt;input_name&gt; --     │
+│                                              double underscore!) name as     │
+│                                              key, and a string (the          │
+│                                              resulting workflow input        │
+│                                              alias) as value.                │
+│                    output_aliases   object   A map of output aliases,        │
+│                                              with the calculated             │
+│                                              (&lt;step_id&gt;__&lt;output_name&gt;       │
+│                                              -- double underscore!) name     │
+│                                              as key, and a string (the       │
+│                                              resulting workflow output       │
+│                                              alias) as value.                │
+│                    doc              string   Documentation about what        │
+│                                              the pipeline does.              │
+│                    meta             object   Metadata for this workflow.     │
+│                   ───────────────────────────────────────────────────────    │
+│                                                                              │
+│   src            constants: {}                                               │
+│                  steps:                                                      │
+│                  - module_type: find_shortest_path                           │
+│                    step_id: find_shortest_path                               │
+│                    module_config:                                            │
+│                      mode: single-pair                                       │
+│                    input_links: {}                                           │
+│                  - module_type: graph_properties                             │
+│                    step_id: extract_properties                               │
+│                    module_config:                                            │
+│                      density: false                                          │
+│                    input_links: {}                                           │
+│                  input_aliases:                                              │
+│                    find_shortest_path__graph: graph                          │
+│                    extract_properties__graph: graph                          │
+│                    find_shortest_path__source_node: shortest_path_source_…   │
+│                    find_shortest_path__target_node: shortest_path_target_…   │
+│                  output_aliases:                                             │
+│                    find_shortest_path__path: shortest_path                   │
+│                    extract_properties__largest_component: largest_compone…   │
+│                    extract_properties__density_largest_component: density…   │
+│                    extract_properties__number_of_nodes: number_of_nodes      │
+│                    extract_properties__number_of_edges: number_of_edges      │
+│                  doc: First iteration of a network analysis pipeline. Thi…   │
+│                  meta: {}                                                    │
+│                  module_type_name: network_analysis                          │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
 </code></pre></div>
 
 <h2 id="nor"><code>nor</code><a class="headerlink" href="#nor" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><code>PipelineModule: nor
-
-  class               kiara.modules.pipelines.Nor                               
-
-  doc                 Returns &#39;True&#39; if both inputs are &#39;False&#39;.                
-
-  config class        kiara.config.PipelineModuleConfig                         
-
-  config               ──────────────────────────────────────────────────────   
-                        constants   object   Value constants for this           
-                                             module.                            
-                        meta        object   Metadata for this workflow.        
-                       ──────────────────────────────────────────────────────   
-
-  pipeline inputs     a:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing this input state.             
-                      b:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing this input state.             
-
-  pipeline outputs    y:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing the module output state.      
-
-  processing stages   stage 0:                                                  
-                        or:                                                     
-                          module: or                                            
-                          desc: Returns &#39;True&#39; if one of the inputs is &#39;True&#39;.  
-                          inputs:                                               
-                          - a ← __pipeline__.a                                  
-                          - b ← __pipeline__.b                                  
-                          outputs:                                              
-                          - y                                                   
-                      stage 1:                                                  
-                        not:                                                    
-                          module: not                                           
-                          desc: Negates the input.                              
-                          inputs:                                               
-                          - a ← or.y                                            
-                          outputs:                                              
-                          - y → __pipeline__.y                                  
+<div class="codehilite"><pre><span></span><code>╭─ Module: nor ────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│   class          kiara.modules.pipelines.Nor                                 │
+│                                                                              │
+│   doc            Returns &#39;True&#39; if both inputs are &#39;False&#39;.                  │
+│                                                                              │
+│   source repo    -- n/a --                                                   │
+│                                                                              │
+│   config class   kiara.config.PipelineModuleConfig                           │
+│                                                                              │
+│   config          ───────────────────────────────────────────────────────    │
+│                    constants        object   Value constants for this        │
+│                                              module.                         │
+│                    steps            array    A list of steps/modules of      │
+│                                              this pipeline, and their        │
+│                                              connections.                    │
+│                    input_aliases    object   A map of input aliases,         │
+│                                              with the calculated             │
+│                                              (&lt;step_id&gt;__&lt;input_name&gt; --     │
+│                                              double underscore!) name as     │
+│                                              key, and a string (the          │
+│                                              resulting workflow input        │
+│                                              alias) as value.                │
+│                    output_aliases   object   A map of output aliases,        │
+│                                              with the calculated             │
+│                                              (&lt;step_id&gt;__&lt;output_name&gt;       │
+│                                              -- double underscore!) name     │
+│                                              as key, and a string (the       │
+│                                              resulting workflow output       │
+│                                              alias) as value.                │
+│                    doc              string   Documentation about what        │
+│                                              the pipeline does.              │
+│                    meta             object   Metadata for this workflow.     │
+│                   ───────────────────────────────────────────────────────    │
+│                                                                              │
+│   src            constants: {}                                               │
+│                  steps:                                                      │
+│                  - module_type: or                                           │
+│                    step_id: or                                               │
+│                    module_config: {}                                         │
+│                    input_links: {}                                           │
+│                  - module_type: not                                          │
+│                    step_id: not                                              │
+│                    module_config: {}                                         │
+│                    input_links:                                              │
+│                      a:                                                      │
+│                      - step_id: or                                           │
+│                        value_name: y                                         │
+│                        sub_value:                                            │
+│                  input_aliases:                                              │
+│                    or__a: a                                                  │
+│                    or__b: b                                                  │
+│                  output_aliases:                                             │
+│                    not__y: y                                                 │
+│                  doc: Returns &#39;True&#39; if both inputs are &#39;False&#39;.             │
+│                  meta: {}                                                    │
+│                  module_type_name: nor                                       │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
 </code></pre></div>
 
 <h2 id="xor"><code>xor</code><a class="headerlink" href="#xor" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><code>PipelineModule: xor
-
-  class               kiara.modules.pipelines.Xor                               
-
-  doc                 Returns &#39;True&#39; if exactly one of it&#39;s two inputs is       
-                      &#39;True&#39;.                                                   
-
-  config class        kiara.config.PipelineModuleConfig                         
-
-  config               ──────────────────────────────────────────────────────   
-                        constants   object   Value constants for this           
-                                             module.                            
-                        meta        object   Metadata for this workflow.        
-                       ──────────────────────────────────────────────────────   
-
-  pipeline inputs     a:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing this input state.             
-                      b:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing this input state.             
-
-  pipeline outputs    y:                                                        
-                        type: boolean                                           
-                        doc: A boolean describing the module output state.      
-
-  processing stages   stage 0:                                                  
-                        or:                                                     
-                          module: or                                            
-                          desc: Returns &#39;True&#39; if one of the inputs is &#39;True&#39;.  
-                          inputs:                                               
-                          - a ← __pipeline__.a                                  
-                          - b ← __pipeline__.b                                  
-                          outputs:                                              
-                          - y                                                   
-                        nand:                                                   
-                          module: nand                                          
-                          desc: Returns &#39;False&#39; if both inputs are &#39;True&#39;.      
-                          inputs:                                               
-                          - a ← __pipeline__.a                                  
-                          - b ← __pipeline__.b                                  
-                          outputs:                                              
-                          - y                                                   
-                      stage 1:                                                  
-                        and:                                                    
-                          module: and                                           
-                          desc: Returns &#39;True&#39; if both inputs are &#39;True&#39;.       
-                          inputs:                                               
-                          - a ← or.y                                            
-                          - b ← nand.y                                          
-                          outputs:                                              
-                          - y → __pipeline__.y                                  
+<div class="codehilite"><pre><span></span><code>╭─ Module: xor ────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│   class          kiara.modules.pipelines.Xor                                 │
+│                                                                              │
+│   doc            Returns &#39;True&#39; if exactly one of it&#39;s two inputs is         │
+│                  &#39;True&#39;.                                                     │
+│                                                                              │
+│   source repo    -- n/a --                                                   │
+│                                                                              │
+│   config class   kiara.config.PipelineModuleConfig                           │
+│                                                                              │
+│   config          ───────────────────────────────────────────────────────    │
+│                    constants        object   Value constants for this        │
+│                                              module.                         │
+│                    steps            array    A list of steps/modules of      │
+│                                              this pipeline, and their        │
+│                                              connections.                    │
+│                    input_aliases    object   A map of input aliases,         │
+│                                              with the calculated             │
+│                                              (&lt;step_id&gt;__&lt;input_name&gt; --     │
+│                                              double underscore!) name as     │
+│                                              key, and a string (the          │
+│                                              resulting workflow input        │
+│                                              alias) as value.                │
+│                    output_aliases   object   A map of output aliases,        │
+│                                              with the calculated             │
+│                                              (&lt;step_id&gt;__&lt;output_name&gt;       │
+│                                              -- double underscore!) name     │
+│                                              as key, and a string (the       │
+│                                              resulting workflow output       │
+│                                              alias) as value.                │
+│                    doc              string   Documentation about what        │
+│                                              the pipeline does.              │
+│                    meta             object   Metadata for this workflow.     │
+│                   ───────────────────────────────────────────────────────    │
+│                                                                              │
+│   src            constants: {}                                               │
+│                  steps:                                                      │
+│                  - module_type: or                                           │
+│                    step_id: or                                               │
+│                    module_config: {}                                         │
+│                    input_links: {}                                           │
+│                  - module_type: nand                                         │
+│                    step_id: nand                                             │
+│                    module_config: {}                                         │
+│                    input_links: {}                                           │
+│                  - module_type: and                                          │
+│                    step_id: and                                              │
+│                    module_config: {}                                         │
+│                    input_links:                                              │
+│                      a:                                                      │
+│                      - step_id: or                                           │
+│                        value_name: y                                         │
+│                        sub_value:                                            │
+│                      b:                                                      │
+│                      - step_id: nand                                         │
+│                        value_name: y                                         │
+│                        sub_value:                                            │
+│                  input_aliases:                                              │
+│                    or__a: a                                                  │
+│                    or__b: b                                                  │
+│                    nand__a: a                                                │
+│                    nand__b: b                                                │
+│                  output_aliases:                                             │
+│                    and__y: y                                                 │
+│                  doc: Returns &#39;True&#39; if exactly one of it&#39;s two inputs is…   │
+│                  meta: {}                                                    │
+│                  module_type_name: xor                                       │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
 </code></pre></div>
                 
               
@@ -651,7 +951,7 @@
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fe42c31b.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.7353b375.min.js"></script>
+      <script src="../assets/javascripts/bundle.4ea5477f.min.js"></script>
       
     
   </body>
