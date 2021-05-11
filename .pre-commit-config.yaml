@@ -43,8 +43,8 @@ repos:
   - id: mypy
     files: "^src/"
     pass_filenames: true
-    args: ["--config-file", "setup.cfg"]
-    additional_dependencies: ["git+https://github.com/DHARPA-Project/kiara.git#egg=kiara", pydantic>=1.8.0, rich>=10.0.0, ruamel.yaml]
+    args: ["--config-file", "setup.cfg", "--ignore-missing-imports"]
+    additional_dependencies: [pydantic>=1.8.0, rich>=10.0.0, ruamel.yaml]
 
 
 - repo: git://github.com/pre-commit/pre-commit-hooks

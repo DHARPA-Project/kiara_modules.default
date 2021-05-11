@@ -8,26 +8,26 @@
 
 A set of commonly used/useful default modules (and pipelines) for [*Kiara*](https://github.com/DHARPA-project/kiara).
 
- - Documentation: [https://dharpa.org/kiara](https://dharpa.org/kiara_modules.default)
- - Code: [https://github.com/DHARPA-Project/kiara](https://github.com/DHARPA-Project/kiara_modules.default)
+ - Documentation: [https://dharpa.org/kiara_modules.default](https://dharpa.org/kiara_modules.default)
+ - Code: [https://github.com/DHARPA-Project/kiara_modules.default](https://github.com/DHARPA-Project/kiara_modules.default)
 
 ## Description
 
 *Kiara* is the data orchestration engine driving the DHARPA project application (yet to be named). This repository contains
-a set of officially supported modules.
+a set of officially supported processing modules and pipelines.
 
-# Development
+## Development
 
-## Requirements
+### Requirements
 
-- Python (version >=3.6 -- some make targets only work for Python >=3.7, but *kiara* itself should work on 3.6)
+- Python (version >=3.6 -- some make targets only work for Python >=3.7 though)
 - pip, virtualenv
 - git
 - make
 - [direnv](https://direnv.net/) (optional)
 
 
-## Prepare development environment
+### Prepare development environment
 
 If you only want to work on the modules, and not the core *Kiara* codebase, follow the instructions below. Otherwise, please
 check the notes on how to setup a *Kiara* development environment under (TODO).
@@ -40,19 +40,7 @@ source .venv/bin/activate
 make init
 ```
 
-If you use [direnv](https://direnv.net/), you can alternatively do:
-
-``` console
-git clone https://github.com/DHARPA-Project/kiara_modules.default.git
-cd kiara
-cp .envrc.disabled .envrc
-direnv allow   # if using direnv, otherwise activate virtualenv
-make init
-```
-
-*Note*: you might want to adjust the Python version in ``.envrc`` (should not be necessary in most cases though)
-
-## ``make`` targets
+### ``make`` targets
 
 - ``init``: init development project (install project & dev dependencies into virtualenv, as well as pre-commit git hook)
 - ``update-dependencies``: update development dependencies (mainly the core ``kiara`` package from git)
@@ -66,7 +54,7 @@ make init
 For details (and other, minor targets), check the ``Makefile``.
 
 
-## Running tests
+### Running tests
 
 ``` console
 > make test

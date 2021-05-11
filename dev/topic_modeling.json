@@ -1,0 +1,121 @@
+{
+  "module_type_name": "topic_modelling",
+  "doc": "Topic modelling dev pipeline.",
+  "steps": [
+    {
+      "module_type": "import_local_folder",
+      "step_id": "read_files_in_folder"
+    },
+    {
+      "module_type": "create_table_from_text_files",
+      "module_config": {
+        "columns": ["id", "rel_path", "file_name", "content"]
+      },
+      "step_id": "create_table",
+      "input_links": {
+        "files": "read_files_in_folder.file_bundle"
+      }
+    },
+    {
+      "module_type": "map",
+      "module_config": {
+        "module_type": "extract_date"
+      },
+      "step_id": "extract_date",
+      "input_links": {
+        "array": "create_table.table.file_name"
+      }
+    },
+    {
+      "module_type": "map",
+      "module_config": {
+        "module_type": "match_regex",
+        "module_config": {
+          "regex": "(\\w+\\d+)_\\d{4}-\\d{2}-\\d{2}_",
+          "only_first_match": true
+        }
+      },
+      "step_id": "extract_ref",
+      "input_links": {
+        "array": "create_table.table.file_name"
+      }
+    },
+    {
+      "module_type": "map",
+      "module_config": {
+        "module_type": "match_regex",
+        "module_config": {
+          "regex": "_(\\d{4})-\\d{2}-\\d{2}_",
+          "only_first_match": true
+        }
+      },
+      "step_id": "extract_year",
+      "input_links": {
+        "array": "create_table.table.file_name"
+      }
+    },
+    {
+      "module_type": "map",
+      "module_config": {
+        "module_type": "match_regex",
+        "module_config": {
+          "regex": "_\\d{4}-(\\d{2})-\\d{2}_",
+          "only_first_match": true
+        }
+      },
+      "step_id": "extract_month",
+      "input_links": {
+        "array": "create_table.table.file_name"
+      }
+    },
+    {
+      "module_type": "map",
+      "module_config": {
+        "module_type": "match_regex",
+        "module_config": {
+          "regex": "_\\d{4}-\\d{2}-(\\d{2})_",
+          "only_first_match": true
+        }
+      },
+      "step_id": "extract_day",
+      "input_links": {
+        "array": "create_table.table.file_name"
+      }
+    },
+    {
+      "module_type": "map",
+      "module_config": {
+        "module_type": "replace_string",
+        "module_config": {
+          "replacement_map": {
+            "sn85066408": "L\\'Italia",
+            "2012271201": "Cronaca Sovversiva"
+          }
+        }
+      },
+      "step_id": "get_publication_name",
+      "input_links": {
+        "array": "extract_ref.array"
+      }
+    },
+    {
+      "module_type": "merge_table",
+      "step_id": "merge_table",
+      "input_links": {
+        "sources": [
+          "create_table.table",
+          "extract_date.array",
+          "extract_year.array",
+          "extract_month.array",
+          "extract_day.array",
+          "extract_ref.array",
+          "get_publication_name.array"
+        ]
+      }
+    }
+  ],
+  "input_aliases": "auto",
+  "output_aliases": "auto"
+
+}
+

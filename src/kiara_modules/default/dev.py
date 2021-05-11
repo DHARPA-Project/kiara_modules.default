@@ -42,7 +42,9 @@ class DummyModule(KiaraModule):
 
         result = {}
         for k, v in self.config.get("input_schema").items():  # type: ignore
-            result[k] = ValueSchema(**v)
+            schema = ValueSchema(**v)
+            schema.validate_types(self._kiara)
+            result[k] = schema
         return result
 
     def create_output_schema(self) -> typing.Mapping[str, ValueSchema]:
@@ -50,7 +52,9 @@ class DummyModule(KiaraModule):
 
         result = {}
         for k, v in self.config.get("output_schema").items():  # type: ignore
-            result[k] = ValueSchema(**v)
+            schema = ValueSchema(**v)
+            schema.validate_types(self._kiara)
+            result[k] = schema
         return result
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
@@ -66,8 +70,9 @@ class DummyModule(KiaraModule):
         value_dict = {}
         for output_name in self.output_names:
             if output_name not in output_values.keys():
-                v = self.output_schemas[output_name].type_obj.fake_value()
-                value_dict[output_name] = v
+                raise NotImplementedError()
+                # v = self.output_schemas[output_name].type_obj.fake_value()
+                # value_dict[output_name] = v
             else:
                 value_dict[output_name] = output_values[output_name]
         outputs.set_values(**value_dict)

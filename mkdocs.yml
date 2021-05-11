@@ -1,5 +1,5 @@
 site_name: kiara_modules.default
-repo_url: https://gitlab.com/frkl/kiara_modules.default
+repo_url: https://github.com/DHARPA-project/kiara_modules.default
 site_author: Markus Binsteiner
 docs_dir: docs
 site_dir: build/site
@@ -22,10 +22,12 @@ markdown_extensions:
 
 nav:
 - Home: index.md
-- Usage: usage.md
+- Included modules: modules_list.md
+- Included pipelines: pipelines_list.md
 
 plugins:
 - search
+- mknotebooks
 - mkdocstrings:
     default_handler: python
     watch:
@@ -34,5 +36,8 @@ plugins:
     main_module: "kiara_modules.default"
 - macros:
    modules:
-     - frkl.project.meta.documentation.mkdocs_macros_frkl
+     - frkl.project.documentation.mkdocs_macros_frkl
      - kiara.doc.mkdocs_macros_kiara
+- gen-files:
+    scripts:
+      - scripts/documentation/gen_module_doc.py
