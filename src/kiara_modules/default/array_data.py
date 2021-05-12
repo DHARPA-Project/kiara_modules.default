@@ -2,6 +2,7 @@
 import copy
 import pyarrow as pa
 import typing
+from concurrent.futures import ThreadPoolExecutor
 from pydantic import Field
 
 from kiara import KiaraModule
@@ -97,7 +98,7 @@ class MapModule(KiaraModule):
         outputs = {
             "array": {
                 "type": "array",
-                "doc": "An array of equal length to the input array, containing true/false values which determine whether a row or item in a table or array should be included or not.",
+                "doc": "An array of equal length to the input array, containing the 'mapped' values.",
             }
         }
         return outputs
@@ -123,16 +124,34 @@ class MapModule(KiaraModule):
 
             init_data[input_name] = inputs.get_value_data(input_name)
 
-        result = []
+        multi_threaded = False
+        if multi_threaded:
+
+            def run_module(item):
+                _d = copy.copy(init_data)
+                _d[self._module_input_name] = item
+                r = module_obj.run(**_d)
+                return r
+
+            executor = ThreadPoolExecutor()
+            results: typing.Any = executor.map(run_module, input_array)
+            executor.shutdown(wait=True)
+
+        else:
+            results = []
+            for item in input_array:
+                _d = copy.copy(init_data)
+                _d[self._module_input_name] = item
+                r = module_obj.run(**_d)
+                results.append(r)
+
+        result_list = []
         result_types = set()
-        for item in input_array:
-            _d = copy.copy(init_data)
-            _d[self._module_input_name] = item
+        for r in results:
+            r_item = r[module_output_name]
+            result_list.append(r_item)
+            result_types.add(type(r_item))
 
-            r = module_obj.run(**_d)
-            result_types.add(type(r))
-            result.append(r[module_output_name])
-
-        # assert len(result_types) == 1
+        assert len(result_types) == 1
         # print(result_types)
-        outputs.array = pa.array(result)
+        outputs.array = pa.array(result_list)

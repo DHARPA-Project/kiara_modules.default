@@ -163,3 +163,38 @@ class RemoveStopwordsModule(KiaraModule):
             result.append(cleaned_list)
 
         outputs.token_list = pa.array(result)
+
+
+class LemmatizeModule(KiaraModule):
+    def create_input_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
+        inputs = {"tokens": {"type": "list", "doc": "A list of tokens."}}
+        return inputs
+
+    def create_output_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
+        outputs = {"tokens": {"type": "list", "doc": "A list of lemmatized tokens."}}
+        return outputs
+
+    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+
+        tokens = inputs.get_value_data("tokens")
+        print(f"LEMMA: {tokens[0: 20]}")
+
+        # TODO: install this on demand?
+        import it_core_news_sm
+
+        it_nlp = it_core_news_sm.load(disable=["tagger", "parser", "ner"])
+
+        lemmatized_doc = []
+        for w in tokens:
+            w_lemma = [token.lemma_ for token in it_nlp(w)]
+            lemmatized_doc.append(w_lemma[0])
+
+        outputs.tokens = lemmatized_doc

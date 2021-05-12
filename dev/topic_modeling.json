@@ -104,6 +104,16 @@
       "input_links": {
         "token_lists": "tokenize_text_corpus.array"
       }
+    },
+    {
+      "module_type": "map",
+      "module_config": {
+        "module_type": "lemmatize"
+      },
+      "step_id": "lemmatize",
+      "input_links": {
+        "array": "remove_stopwords.token_list"
+      }
     }
   ],
   "input_aliases": "auto",
