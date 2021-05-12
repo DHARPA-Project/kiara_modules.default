@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import dateutil
 import re
 import typing
 from abc import abstractmethod
@@ -30,42 +29,13 @@ class StringManipulationModule(KiaraModule):
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
 
-        input_string = inputs.text
+        input_string = inputs.get_value_data("text")
         result = self.process_string(input_string)
         outputs.text = result
 
     @abstractmethod
     def process_string(self, text: str) -> str:
         pass
-
-
-class ExtractDateModule(KiaraModule):
-    def create_input_schema(
-        self,
-    ) -> typing.Mapping[
-        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
-    ]:
-
-        return {"text": {"type": "string", "doc": "The input string."}}
-
-    def create_output_schema(
-        self,
-    ) -> typing.Mapping[
-        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
-    ]:
-        return {
-            "date": {"type": "date", "doc": "The date extracted from the input string."}
-        }
-
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
-
-        text = inputs.text
-
-        date_match = re.findall(r"_(\d{4}-\d{2}-\d{2})_", text)
-        assert date_match
-
-        d_obj = dateutil.parser.parse(date_match[0])  # type: ignore
-        outputs.date = d_obj
 
 
 class RegexModuleConfig(KiaraModuleConfig):
@@ -103,7 +73,7 @@ class RegexModule(KiaraModule):
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
 
-        text = inputs.text
+        text = inputs.get_value_data("text")
         regex = self.get_config_value("regex")
         matches = re.findall(regex, text)
 
@@ -150,7 +120,7 @@ class ReplaceStringModule(KiaraModule):
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
 
-        text = inputs.text
+        text = inputs.get_value_data("text")
         repl_map = self.get_config_value("replacement_map")
         default = self.get_config_value("default_value")
 

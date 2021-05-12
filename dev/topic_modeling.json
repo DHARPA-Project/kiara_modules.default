@@ -43,48 +43,6 @@
     {
       "module_type": "map",
       "module_config": {
-        "module_type": "match_regex",
-        "module_config": {
-          "regex": "_(\\d{4})-\\d{2}-\\d{2}_",
-          "only_first_match": true
-        }
-      },
-      "step_id": "extract_year",
-      "input_links": {
-        "array": "create_table.table.file_name"
-      }
-    },
-    {
-      "module_type": "map",
-      "module_config": {
-        "module_type": "match_regex",
-        "module_config": {
-          "regex": "_\\d{4}-(\\d{2})-\\d{2}_",
-          "only_first_match": true
-        }
-      },
-      "step_id": "extract_month",
-      "input_links": {
-        "array": "create_table.table.file_name"
-      }
-    },
-    {
-      "module_type": "map",
-      "module_config": {
-        "module_type": "match_regex",
-        "module_config": {
-          "regex": "_\\d{4}-\\d{2}-(\\d{2})_",
-          "only_first_match": true
-        }
-      },
-      "step_id": "extract_day",
-      "input_links": {
-        "array": "create_table.table.file_name"
-      }
-    },
-    {
-      "module_type": "map",
-      "module_config": {
         "module_type": "replace_string",
         "module_config": {
           "replacement_map": {
@@ -100,22 +58,55 @@
     },
     {
       "module_type": "merge_table",
-      "step_id": "merge_table",
+      "step_id": "merged_table",
       "input_links": {
         "sources": [
           "create_table.table",
           "extract_date.array",
-          "extract_year.array",
-          "extract_month.array",
-          "extract_day.array",
           "extract_ref.array",
           "get_publication_name.array"
         ]
+      }
+    },
+    {
+      "module_type": "map",
+      "module_config": {
+        "module_type": "date_range_check",
+        "input_name": "date"
+      },
+      "step_id": "create_date_range_filter",
+      "input_links": {
+        "array": "extract_date"
+      }
+    },
+    {
+      "module_type": "filter_table",
+      "step_id": "filtered_table",
+      "input_links": {
+        "table": "merged_table.table",
+        "mask": "create_date_range_filter.array"
+      }
+    },
+    {
+      "module_type": "map",
+      "module_config": {
+        "module_type": "tokenize_text",
+        "input_name": "text"
+      },
+      "step_id": "tokenize_text_corpus",
+      "input_links": {
+        "array": "filtered_table.table.content"
+      }
+    },
+    {
+      "module_type": "remove_stopwords",
+      "step_id": "remove_stopwords",
+      "input_links": {
+        "token_lists": "tokenize_text_corpus.array"
       }
     }
   ],
   "input_aliases": "auto",
   "output_aliases": "auto"
-
 }
 

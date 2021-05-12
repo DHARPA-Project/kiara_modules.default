@@ -325,8 +325,8 @@ class FindShortestPathModule(KiaraModule):
             raise NotImplementedError()
 
         graph: Graph = inputs.graph
-        source: typing.Any = inputs.source_node
-        target: typing.Any = inputs.target_node
+        source: typing.Any = inputs.get_value_data("source_node")
+        target: typing.Any = inputs.get_value_data("target_node")
 
         if source not in graph.nodes:
             raise KiaraProcessingException(
@@ -403,7 +403,7 @@ class ExtractGraphPropertiesModule(KiaraModule):
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
 
-        graph: Graph = inputs.graph
+        graph: Graph = inputs.get_value_data("graph")
 
         if self.get_config_value("find_largest_component"):
             lc_graph = copy.deepcopy(graph)

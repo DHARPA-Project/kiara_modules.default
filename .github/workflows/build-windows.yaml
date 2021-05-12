@@ -1,4 +1,4 @@
-name: "windows tests & binary build for 'kiara_modules.default'"
+name: "windows tests for 'kiara_modules.default'"
 # This workflow is triggered on pushes to the repository.
 on: [push]
 

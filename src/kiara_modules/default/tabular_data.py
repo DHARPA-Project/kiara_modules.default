@@ -149,7 +149,7 @@ class CreateTableFromTextFilesModule(KiaraModule):
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
 
-        bundle: FileBundleModel = inputs.files
+        bundle: FileBundleModel = inputs.get_value_data("files")
 
         columns = self.get_config_value("columns")
         if not columns:
@@ -211,7 +211,7 @@ class MergeTableModule(KiaraModule):
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
 
-        sources = inputs.sources
+        sources = inputs.get_value_data("sources")
 
         len_dict = {}
         arrays = []
@@ -257,3 +257,45 @@ class MergeTableModule(KiaraModule):
         table = pa.Table.from_arrays(arrays=arrays, names=column_names)
 
         outputs.table = table
+
+
+class TableFilterModuleConfig(KiaraModuleConfig):
+
+    pass
+
+
+class FilterTableModule(KiaraModule):
+
+    _config_cls = TableFilterModuleConfig
+
+    def create_input_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
+        inputs = {
+            "table": {"type": "table", "doc": "The table to filter."},
+            "mask": {
+                "type": "array",
+                "doc": "An mask array of booleans of the same length as the table.",
+            },
+        }
+        return inputs
+
+    def create_output_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
+
+        outputs = {"table": {"type": "table", "doc": "The filtered table."}}
+        return outputs
+
+    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+
+        input_table: pa.Table = inputs.get_value_data("table")
+        filter_array: pa.Array = inputs.get_value_data("mask")
+
+        filtered = input_table.filter(filter_array)
+
+        outputs.table = filtered
