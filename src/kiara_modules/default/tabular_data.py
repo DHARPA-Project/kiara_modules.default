@@ -66,7 +66,7 @@ class CreateTableFromFileModule(KiaraModule):
                     self.get_config_value("only_columns")
                 )
 
-        outputs.table = imported_data
+        outputs.set_value("table", imported_data)
 
 
 AVAILABLE_FILE_COLUMNS = [
@@ -180,7 +180,7 @@ class CreateTableFromTextFilesModule(KiaraModule):
 
         table = pa.Table.from_pydict(tabular)
 
-        outputs.table = table
+        outputs.set_value("table", table)
 
 
 class MergeTableModule(KiaraModule):
@@ -256,7 +256,7 @@ class MergeTableModule(KiaraModule):
 
         table = pa.Table.from_arrays(arrays=arrays, names=column_names)
 
-        outputs.table = table
+        outputs.set_value("table", table)
 
 
 class TableFilterModuleConfig(KiaraModuleConfig):
@@ -298,4 +298,4 @@ class FilterTableModule(KiaraModule):
 
         filtered = input_table.filter(filter_array)
 
-        outputs.table = filtered
+        outputs.set_value("table", filtered)

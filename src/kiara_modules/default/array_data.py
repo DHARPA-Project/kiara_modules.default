@@ -122,7 +122,7 @@ class MapModule(KiaraModule):
             if input_name in ["array", self.module_input_name]:
                 continue
 
-            init_data[input_name] = inputs.get_value_data(input_name)
+            init_data[input_name] = inputs.get_value_obj(input_name)
 
         multi_threaded = False
         if multi_threaded:
@@ -131,7 +131,7 @@ class MapModule(KiaraModule):
                 _d = copy.copy(init_data)
                 _d[self._module_input_name] = item
                 r = module_obj.run(**_d)
-                return r
+                return r.get_all_value_data()
 
             executor = ThreadPoolExecutor()
             results: typing.Any = executor.map(run_module, input_array)
@@ -143,7 +143,7 @@ class MapModule(KiaraModule):
                 _d = copy.copy(init_data)
                 _d[self._module_input_name] = item
                 r = module_obj.run(**_d)
-                results.append(r)
+                results.append(r.get_all_value_data())
 
         result_list = []
         result_types = set()
@@ -153,5 +153,4 @@ class MapModule(KiaraModule):
             result_types.add(type(r_item))
 
         assert len(result_types) == 1
-        # print(result_types)
-        outputs.array = pa.array(result_list)
+        outputs.set_value("array", pa.array(result_list))

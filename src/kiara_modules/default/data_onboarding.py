@@ -43,9 +43,9 @@ class ImportLocalFileModule(KiaraModule):
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
 
-        path = inputs.path
+        path = inputs.get_value_data("path")
         file_model = FileModel.import_file(path)
-        outputs.file = file_model
+        outputs.set_value("file", file_model)
 
 
 class ImportLocalFolderModule(KiaraModule):
@@ -86,10 +86,10 @@ class ImportLocalFolderModule(KiaraModule):
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
 
-        path = inputs.path
+        path = inputs.get_value_data("path")
 
-        included_files = inputs.included_files
-        excluded_dirs = inputs.excluded_dirs
+        included_files = inputs.get_value_data("included_files")
+        excluded_dirs = inputs.get_value_data("excluded_dirs")
 
         import_config = FolderImportConfig(
             include_files=included_files, exclude_dirs=excluded_dirs
@@ -97,4 +97,4 @@ class ImportLocalFolderModule(KiaraModule):
 
         bundle = FileBundleModel.import_folder(source=path, import_config=import_config)
 
-        outputs.file_bundle = bundle
+        outputs.set_values(file_bundle=bundle)

@@ -138,7 +138,7 @@ class CreateGraphFromEdgesTableModule(KiaraModule):
             edge_attr=True,
             create_using=graph_cls,
         )
-        outputs.graph = graph
+        outputs.set_value("graph", graph)
 
 
 class AugmentNetworkGraphModule(KiaraModule):
@@ -199,7 +199,7 @@ class AugmentNetworkGraphModule(KiaraModule):
         )
         graph.add_nodes_from(attr_dict)
 
-        outputs.graph = graph
+        outputs.set_value("graph", graph)
 
 
 class AddNodesToNetworkGraphModule(KiaraModule):
@@ -256,7 +256,7 @@ class AddNodesToNetworkGraphModule(KiaraModule):
         )
         graph.add_nodes_from(attr_dict)
 
-        outputs.graph = graph
+        outputs.set_value("graph", graph)
 
 
 class FindShortestPathModuleConfig(KiaraModuleConfig):
@@ -339,7 +339,7 @@ class FindShortestPathModule(KiaraModule):
             )
 
         shortest_path = nx.shortest_path(graph, source=source, target=target)
-        outputs.path = shortest_path
+        outputs.set_value("path", shortest_path)
 
 
 class ExtractGraphPropertiesModuleConfig(KiaraModuleConfig):

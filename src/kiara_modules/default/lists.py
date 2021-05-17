@@ -41,4 +41,4 @@ class IncludedInListCheckModule(KiaraModule):
         item_list = inputs.get_value_data("list")
         item = inputs.get_value_data("item")
 
-        outputs.is_included = item in item_list
+        outputs.set_value("is_included", item in item_list)

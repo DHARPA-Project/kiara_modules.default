@@ -42,7 +42,8 @@ class ExtractDateModule(KiaraModule):
         assert date_match
 
         d_obj = parser.parse(date_match[0])  # type: ignore
-        outputs.date = d_obj
+
+        outputs.set_value("date", d_obj)
 
 
 class DateRangeCheckModule(KiaraModule):
@@ -102,4 +103,4 @@ class DateRangeCheckModule(KiaraModule):
         else:
             matches = d <= latest
 
-        outputs.within_range = matches
+        outputs.set_value("within_range", matches)

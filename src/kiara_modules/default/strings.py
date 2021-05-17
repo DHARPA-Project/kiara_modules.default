@@ -2,13 +2,15 @@
 import re
 import typing
 from abc import abstractmethod
+from pprint import pformat
 from pydantic import Field
 
 from kiara import KiaraModule
 from kiara.config import KiaraModuleConfig
-from kiara.data.values import ValueSchema
+from kiara.data.values import Value, ValueSchema
 from kiara.exceptions import KiaraProcessingException
 from kiara.module import StepInputs, StepOutputs
+from kiara.utils.pretty_print import pretty_print_arrow_table
 
 
 class StringManipulationModule(KiaraModule):
@@ -85,7 +87,7 @@ class RegexModule(KiaraModule):
         else:
             result = matches
 
-        outputs.text = result
+        outputs.set_value("text", result)
 
 
 class ReplaceModuleConfig(KiaraModuleConfig):
@@ -126,8 +128,66 @@ class ReplaceStringModule(KiaraModule):
 
         if text not in repl_map.keys():
             if default is None:
-                outputs.text = text
+                result = text
             else:
-                outputs.text = default
+                result = default
         else:
-            outputs.text = repl_map[text]
+            result = repl_map[text]
+
+        outputs.set_value("text", result)
+
+
+class PrettyPrintModule(KiaraModule):
+    def create_input_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
+
+        inputs = {
+            "item": {
+                "type": "any",
+                "doc": "The object to convert into a pretty string.",
+            },
+            "max_lines": {
+                "type": "integer",
+                "doc": "Maximum number of lines the output should have.",
+                "optional": True,
+            },
+        }
+        return inputs
+
+    def create_output_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
+
+        outputs = {
+            "pretty_string": {
+                "type": "string",
+                "doc": "Pretty string output for the input object.",
+            }
+        }
+        return outputs
+
+    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+
+        value_type = inputs.get_value_obj("item").type_name
+        input_value: Value = inputs.get_value_data("item")
+
+        max_lines = inputs.get_value_data("max_lines")
+
+        if value_type == "table":
+
+            half_lines: typing.Optional[int] = None
+            if max_lines:
+                half_lines = int(max_lines / 2)
+
+            input_value = pretty_print_arrow_table(
+                input_value, num_head=half_lines, num_tail=half_lines
+            )
+        else:
+            input_value = pformat(input_value)
+
+        outputs.set_value("pretty_string", input_value)

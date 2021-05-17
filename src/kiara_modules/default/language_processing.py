@@ -1,8 +1,16 @@
 # -*- coding: utf-8 -*-
+import gensim
 import nltk
+import pandas as pd
 import pyarrow as pa
+import re
 import typing
+from gensim import corpora
+from gensim.models import CoherenceModel
+from pyarrow import Table
 from pydantic import Field
+from spacy.tokens import Doc
+from spacy.util import DummyTokenizer
 
 from kiara import KiaraModule
 from kiara.config import KiaraModuleConfig
@@ -85,7 +93,7 @@ class TokenizeTextModule(KiaraModule):
         if self.get_config_value("to_lowercase"):
             result = (x.lower() for x in result)
 
-        outputs.token_list = list(result)
+        outputs.set_value("token_list", list(result))
 
 
 class RemoveStopwordsModule(KiaraModule):
@@ -162,16 +170,18 @@ class RemoveStopwordsModule(KiaraModule):
             cleaned_list = [x for x in token_list if x not in stopwords]
             result.append(cleaned_list)
 
-        outputs.token_list = pa.array(result)
+        outputs.set_value("token_list", pa.array(result))
 
 
-class LemmatizeModule(KiaraModule):
+class LemmatizeTokensModule(KiaraModule):
+    """Lemmatize a single token list."""
+
     def create_input_schema(
         self,
     ) -> typing.Mapping[
         str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
     ]:
-        inputs = {"tokens": {"type": "list", "doc": "A list of tokens."}}
+        inputs = {"tokens_array": {"type": "list", "doc": "A list of tokens."}}
         return inputs
 
     def create_output_schema(
@@ -179,12 +189,14 @@ class LemmatizeModule(KiaraModule):
     ) -> typing.Mapping[
         str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
     ]:
-        outputs = {"tokens": {"type": "list", "doc": "A list of lemmatized tokens."}}
+        outputs = {
+            "tokens_array": {"type": "list", "doc": "A list of lemmatized tokens."}
+        }
         return outputs
 
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
 
-        tokens = inputs.get_value_data("tokens")
+        tokens = inputs.get_value_data("tokens_array")
         print(f"LEMMA: {tokens[0: 20]}")
 
         # TODO: install this on demand?
@@ -197,4 +209,177 @@ class LemmatizeModule(KiaraModule):
             w_lemma = [token.lemma_ for token in it_nlp(w)]
             lemmatized_doc.append(w_lemma[0])
 
-        outputs.tokens = lemmatized_doc
+        outputs.set_value("tokens_array", lemmatized_doc)
+
+
+class LemmatizeTokensArrayModule(KiaraModule):
+    """Lemmatize an array of token lists.
+
+    Compared to using the ``lemmatize_tokens`` module in combination with ``map``, this is much faster, since it uses
+    a spacy [pipe](https://spacy.io/api/language#pipe) under the hood.
+    """
+
+    def create_input_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
+        inputs = {
+            "tokens_array": {"type": "array", "doc": "An array of lists of tokens."}
+        }
+        return inputs
+
+    def create_output_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
+        outputs = {
+            "tokens_array": {
+                "type": "array",
+                "doc": "An array of lists of lemmatized tokens.",
+            }
+        }
+        return outputs
+
+    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+
+        tokens: pa.Array = inputs.get_value_data("tokens_array")
+
+        # TODO: install this on demand?
+        import it_core_news_sm
+
+        it_nlp = it_core_news_sm.load(disable=["tagger", "parser", "ner"])
+
+        class CustomTokenizer(DummyTokenizer):
+            def __init__(self, vocab):
+                self.vocab = vocab
+
+            def __call__(self, words):
+                return Doc(self.vocab, words=words)
+
+        it_nlp.tokenizer = CustomTokenizer(it_nlp.vocab)
+        result = []
+
+        for doc in it_nlp.pipe(
+            tokens.to_pylist(),
+            batch_size=32,
+            n_process=3,
+            disable=["parser", "ner", "tagger"],
+        ):
+            result.append([tok.lemma_ for tok in doc])
+
+        outputs.set_value("tokens_array", pa.array(result))
+
+
+class LDAModule(KiaraModule):
+    def create_input_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
+        inputs = {
+            "tokens_array": {"type": "array", "doc": "The text corpus."},
+            "num_topics": {
+                "type": "integer",
+                "doc": "The number of topics.",
+                "default": 7,
+            },
+            "compute_coherence": {
+                "type": "boolean",
+                "doc": "Whether to train the model without coherence calculation.",
+                "default": False,
+            },
+        }
+        return inputs
+
+    def create_output_schema(
+        self,
+    ) -> typing.Mapping[
+        str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+    ]:
+
+        outputs = {
+            "topic_model": {
+                "type": "table",
+                "doc": "A table with 'topic_id' and 'words' columns (also 'num_topics', if coherence calculation was switched on).",
+            }
+        }
+        return outputs
+
+    def compute_with_coherence(self, corpus, id2word, corpus_model):
+
+        topics_nr = []
+        coherence_values_gensim = []
+        models = []
+        models_idx = [x for x in range(3, 20)]
+        for num_topics in range(3, 20):
+            # fastest processing time preset (hypothetically less accurate)
+            model = gensim.models.ldamulticore.LdaMulticore(
+                corpus, id2word=id2word, num_topics=num_topics, eval_every=None
+            )
+            # slower processing time preset (hypothetically more accurate) approx 20min for 700 short docs
+            # model = gensim.models.ldamulticore.LdaMulticore(corpus, id2word=id2word, num_topics=num_topics, chunksize=1000, iterations = 200, passes = 10, eval_every = None)
+            # slowest processing time preset approx 35min for 700 short docs (hypothetically even more accurate)
+            # model = gensim.models.ldamulticore.LdaMulticore(corpus, id2word=id2word, num_topics=num_topics, chunksize=2000, iterations = 400, passes = 20, eval_every = None)
+            models.append(model)
+            coherencemodel = CoherenceModel(
+                model=model, texts=corpus_model, dictionary=id2word, coherence="c_v"
+            )
+            coherence_value = coherencemodel.get_coherence()
+            coherence_values_gensim.append(coherence_value)
+            topics_nr.append(str(num_topics))
+
+        df_coherence = pd.DataFrame(topics_nr, columns=["Number of topics"])
+        df_coherence["Coherence"] = coherence_values_gensim
+
+        # Create list with topics and topic words for each number of topics
+        num_topics_list = []
+        topics_list = []
+        for i in range(len(models_idx)):
+            numtopics = models_idx[i]
+            num_topics_list.append(numtopics)
+            model = models[i]
+            topic_print = model.print_topics(num_words=30)
+            topics_list.append(topic_print)
+
+        df_coherence_table = pd.DataFrame(columns=["topic_id", "words", "num_topics"])
+
+        idx = 0
+        for i in range(len(topics_list)):
+            for j in range(len(topics_list[i])):
+                df_coherence_table.loc[idx] = ""
+                df_coherence_table["topic_id"].loc[idx] = j + 1
+                df_coherence_table["words"].loc[idx] = ", ".join(
+                    re.findall(r'"(\w+)"', topics_list[i][j][1])
+                )
+                df_coherence_table["num_topics"].loc[idx] = num_topics_list[i]
+                idx += 1
+
+        return Table.from_pandas(df_coherence_table, preserve_index=False)
+
+    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+
+        tokens_array = inputs.get_value_data("tokens_array")
+        tokens = tokens_array.to_pylist()
+        num_topics = inputs.get_value_data("num_topics")
+
+        compute_coherence = inputs.get_value_data("compute_coherence")
+        id2word = corpora.Dictionary(tokens)
+        corpus = [id2word.doc2bow(text) for text in tokens]
+
+        model = gensim.models.ldamulticore.LdaMulticore(
+            corpus, id2word=id2word, num_topics=num_topics, eval_every=None
+        )
+        topic_print_model = model.print_topics(num_words=30)
+
+        if not compute_coherence:
+            df = pd.DataFrame(topic_print_model, columns=["topic_id", "words"])
+            # TODO: create table directly
+            result = Table.from_pandas(df)
+        else:
+            result = self.compute_with_coherence(
+                corpus=corpus, id2word=id2word, corpus_model=tokens
+            )
+
+        outputs.set_value("topic_model", result)

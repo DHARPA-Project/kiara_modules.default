@@ -106,13 +106,17 @@
       }
     },
     {
-      "module_type": "map",
-      "module_config": {
-        "module_type": "lemmatize_tokens"
-      },
+      "module_type": "lemmatize",
       "step_id": "lemmatize",
       "input_links": {
-        "array": "remove_stopwords.token_list"
+        "tokens_array": "remove_stopwords.token_list"
+      }
+    },
+    {
+      "module_type": "lda",
+      "step_id": "lda",
+      "input_links": {
+        "tokens_array": "lemmatize.tokens_array"
       }
     }
   ],

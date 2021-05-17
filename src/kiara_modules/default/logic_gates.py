@@ -56,7 +56,7 @@ class NotModule(LogicProcessingModule):
 
         time.sleep(self.config.get("delay"))  # type: ignore
 
-        outputs.y = not inputs.a
+        outputs.set_value("y", not inputs.a)
 
 
 class AndModule(LogicProcessingModule):
@@ -90,7 +90,7 @@ class AndModule(LogicProcessingModule):
 
         time.sleep(self.config.delay)  # type: ignore
 
-        outputs.y = inputs.a and inputs.b
+        outputs.set_value("y", inputs.a and inputs.b)
 
 
 class OrModule(LogicProcessingModule):
@@ -123,4 +123,4 @@ class OrModule(LogicProcessingModule):
     def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
 
         time.sleep(self.config.get("delay"))  # type: ignore
-        outputs.y = inputs.a or inputs.b
+        outputs.set_value("y", inputs.a or inputs.b)
