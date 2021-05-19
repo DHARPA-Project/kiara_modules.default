@@ -16,13 +16,13 @@ class DummyProcessingModuleConfig(KiaraModuleConfig):
 
     doc: typing.Optional[str] = None
 
-    input_schema: typing.Mapping[str, typing.Mapping] = Field(
+    input_schema: typing.Dict[str, typing.Dict] = Field(
         description="The input schema for this module."
     )
-    output_schema: typing.Mapping[str, typing.Mapping] = Field(
+    output_schema: typing.Dict[str, typing.Dict] = Field(
         description="The output schema for this module."
     )
-    outputs: typing.Mapping[str, typing.Any] = Field(
+    outputs: typing.Dict[str, typing.Any] = Field(
         description="The (dummy) output for this module.", default_factory=dict
     )
     delay: float = Field(
