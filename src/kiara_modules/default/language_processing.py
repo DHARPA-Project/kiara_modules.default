@@ -14,9 +14,8 @@ from spacy.util import DummyTokenizer
 
 from kiara import KiaraModule
 from kiara.config import KiaraModuleConfig
-from kiara.data.values import ValueSchema
+from kiara.data.values import ValueSchema, ValueSet
 from kiara.exceptions import KiaraProcessingException
-from kiara.module import StepInputs, StepOutputs
 
 
 def get_stopwords():
@@ -70,7 +69,7 @@ class TokenizeTextModule(KiaraModule):
         }
         return outputs
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         # TODO: module-independent caching?
 
@@ -104,7 +103,7 @@ class RemoveStopwordsModule(KiaraModule):
     ]:
 
         # TODO: do something smart and check whether languages are already downloaded, if so, display selection in doc
-        inputs = {
+        inputs: typing.Dict[str, typing.Dict[str, typing.Any]] = {
             "token_lists": {
                 "type": "array",
                 "doc": "An array of string lists (a list of tokens).",
@@ -136,7 +135,7 @@ class RemoveStopwordsModule(KiaraModule):
         }
         return outputs
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         custom_stopwords = inputs.get_value_data("additional_stopwords")
         languages = inputs.get_value_data("languages")
@@ -156,7 +155,7 @@ class RemoveStopwordsModule(KiaraModule):
             stopwords.update(custom_stopwords)
 
         if not stopwords:
-            outputs.token_list = inputs.get_value_obj("token_lists")
+            outputs.set_value("token_list", inputs.get_value_obj("token_lists"))
             return
 
         token_lists = inputs.get_value_data("token_lists")
@@ -194,7 +193,7 @@ class LemmatizeTokensModule(KiaraModule):
         }
         return outputs
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         tokens = inputs.get_value_data("tokens_array")
         print(f"LEMMA: {tokens[0: 20]}")
@@ -242,7 +241,7 @@ class LemmatizeTokensArrayModule(KiaraModule):
         }
         return outputs
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         tokens: pa.Array = inputs.get_value_data("tokens_array")
 
@@ -278,7 +277,7 @@ class LDAModule(KiaraModule):
     ) -> typing.Mapping[
         str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
     ]:
-        inputs = {
+        inputs: typing.Dict[str, typing.Dict[str, typing.Any]] = {
             "tokens_array": {"type": "array", "doc": "The text corpus."},
             "num_topics": {
                 "type": "integer",
@@ -358,7 +357,7 @@ class LDAModule(KiaraModule):
 
         return Table.from_pandas(df_coherence_table, preserve_index=False)
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         tokens_array = inputs.get_value_data("tokens_array")
         tokens = tokens_array.to_pylist()

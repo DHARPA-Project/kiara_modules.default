@@ -3,8 +3,7 @@ import pyarrow
 import typing
 
 from kiara import KiaraModule
-from kiara.data.values import ValueSchema
-from kiara.module import StepInputs, StepOutputs
+from kiara.data.values import ValueSchema, ValueSet
 
 
 class PrepareNodesTableLenaModule(KiaraModule):
@@ -37,9 +36,9 @@ class PrepareNodesTableLenaModule(KiaraModule):
             },
         }
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
-        t: pyarrow.Table = inputs.table
+        t: pyarrow.Table = inputs.get_value_data("table")
         df = t.to_pandas()
 
         df1 = df.iloc[:, 0:11]
@@ -76,6 +75,4 @@ class PrepareNodesTableLenaModule(KiaraModule):
         extr_nodes_unique = extr_nodes.drop_duplicates(subset=["Id"])
 
         result = pyarrow.Table.from_pandas(extr_nodes_unique)
-        outputs.table = result
-
-        outputs.index_column_name = "Id"
+        outputs.set_values(table=result, index_column_name="Id")

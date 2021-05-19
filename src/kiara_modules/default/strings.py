@@ -7,9 +7,8 @@ from pydantic import Field
 
 from kiara import KiaraModule
 from kiara.config import KiaraModuleConfig
-from kiara.data.values import Value, ValueSchema
+from kiara.data.values import Value, ValueSchema, ValueSet
 from kiara.exceptions import KiaraProcessingException
-from kiara.module import StepInputs, StepOutputs
 from kiara.utils.pretty_print import pretty_print_arrow_table
 
 
@@ -29,11 +28,11 @@ class StringManipulationModule(KiaraModule):
     ]:
         return {"text": {"type": "string", "doc": "The processed string."}}
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         input_string = inputs.get_value_data("text")
         result = self.process_string(input_string)
-        outputs.text = result
+        outputs.set_value("text", result)
 
     @abstractmethod
     def process_string(self, text: str) -> str:
@@ -73,7 +72,7 @@ class RegexModule(KiaraModule):
 
         return output_schema
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         text = inputs.get_value_data("text")
         regex = self.get_config_value("regex")
@@ -120,7 +119,7 @@ class ReplaceStringModule(KiaraModule):
     ]:
         return {"text": {"type": "string", "doc": "The replaced string."}}
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         text = inputs.get_value_data("text")
         repl_map = self.get_config_value("replacement_map")
@@ -144,7 +143,7 @@ class PrettyPrintModule(KiaraModule):
         str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
     ]:
 
-        inputs = {
+        inputs: typing.Dict[str, typing.Dict[str, typing.Any]] = {
             "item": {
                 "type": "any",
                 "doc": "The object to convert into a pretty string.",
@@ -171,7 +170,7 @@ class PrettyPrintModule(KiaraModule):
         }
         return outputs
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         value_type = inputs.get_value_obj("item").type_name
         input_value: Value = inputs.get_value_data("item")
@@ -184,10 +183,10 @@ class PrettyPrintModule(KiaraModule):
             if max_lines:
                 half_lines = int(max_lines / 2)
 
-            input_value = pretty_print_arrow_table(
+            input_value_str = pretty_print_arrow_table(
                 input_value, num_head=half_lines, num_tail=half_lines
             )
         else:
-            input_value = pformat(input_value)
+            input_value_str = pformat(input_value)
 
-        outputs.set_value("pretty_string", input_value)
+        outputs.set_value("pretty_string", input_value_str)

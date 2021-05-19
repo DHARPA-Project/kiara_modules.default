@@ -9,9 +9,8 @@ from pydantic import Field, validator
 
 from kiara import KiaraModule
 from kiara.config import KiaraModuleConfig
-from kiara.data.values import ValueSchema
+from kiara.data.values import ValueSchema, ValueSet
 from kiara.exceptions import KiaraProcessingException
-from kiara.module import StepInputs, StepOutputs
 
 
 class GraphTypesEnum(Enum):
@@ -93,21 +92,21 @@ class CreateGraphFromEdgesTableModule(KiaraModule):
             "graph": {"type": "network_graph", "doc": "The (networkx) graph object."},
         }
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         if self.get_config_value("graph_type") is not None:
             _graph_type = self.get_config_value("graph_type")
         else:
-            _graph_type = inputs.graph_type
+            _graph_type = inputs.get_value_data("graph_type")
 
         graph_type = GraphTypesEnum[_graph_type]
 
         edges_table_value = inputs.get_value_obj("edges_table")
         edges_table_obj: pyarrow.Table = edges_table_value.get_value_data()
 
-        source_column = inputs.source_column
-        target_column = inputs.target_column
-        weight_column = inputs.weight_column
+        source_column = inputs.get_value_data("source_column")
+        target_column = inputs.get_value_data("target_column")
+        weight_column = inputs.get_value_data("weight_column")
 
         errors = []
         if source_column not in edges_table_obj.column_names:
@@ -170,7 +169,7 @@ class AugmentNetworkGraphModule(KiaraModule):
     ]:
         return {"graph": {"type": "network_graph", "doc": "The network graph"}}
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         nodes_table_value = inputs.get_value_obj("node_attributes")
 
@@ -178,14 +177,14 @@ class AugmentNetworkGraphModule(KiaraModule):
             # we return the graph as is
             # we are using the 'get_value_obj' method, because there is no need to retrieve the
             # actual data at all
-            outputs.graph = inputs.get_value_obj("graph")
+            outputs.set_value("graph", inputs.get_value_obj("graph"))
             return
 
-        input_graph: Graph = inputs.graph
+        input_graph: Graph = inputs.get_value_data("graph")
         graph: Graph = copy.deepcopy(input_graph)
 
         nodes_table_obj: pyarrow.Table = nodes_table_value.get_value_data()
-        nodes_table_index = inputs.index_column_name
+        nodes_table_index = inputs.get_value_data("index_column_name")
         if nodes_table_index not in nodes_table_obj.column_names:
             raise KiaraProcessingException(
                 f"Node attribute table does not have a column with (index) name '{nodes_table_index}'. Available column names: {', '.join(nodes_table_obj.column_names)}"
@@ -231,7 +230,7 @@ class AddNodesToNetworkGraphModule(KiaraModule):
     ]:
         return {"graph": {"type": "network_graph", "doc": "The network graph"}}
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         nodes_table_value = inputs.get_value_obj("node_attributes")
 
@@ -239,14 +238,14 @@ class AddNodesToNetworkGraphModule(KiaraModule):
             # we return the graph as is
             # we are using the 'get_value_obj' method, because there is no need to retrieve the
             # actual data at all
-            outputs.graph = inputs.get_value_obj("graph")
+            outputs.set_value("graph", inputs.get_value_obj("graph"))
             return
 
-        input_graph: Graph = inputs.graph
+        input_graph: Graph = inputs.get_value_data("graph")
         graph: Graph = copy.deepcopy(input_graph)
 
         nodes_table_obj: pyarrow.Table = nodes_table_value.get_value_data()
-        nodes_table_index = inputs.index_column_name
+        nodes_table_index = inputs.get_value_data("index_column_name")
 
         attr_dict = (
             nodes_table_obj.to_pandas()
@@ -318,13 +317,13 @@ class FindShortestPathModule(KiaraModule):
                 }
             }
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         mode = self.get_config_value("mode")
         if mode != "single-pair":
             raise NotImplementedError()
 
-        graph: Graph = inputs.graph
+        graph: Graph = inputs.get_value_data("graph")
         source: typing.Any = inputs.get_value_data("source_node")
         target: typing.Any = inputs.get_value_data("target_node")
 
@@ -401,7 +400,7 @@ class ExtractGraphPropertiesModule(KiaraModule):
 
         return result
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         graph: Graph = inputs.get_value_data("graph")
 

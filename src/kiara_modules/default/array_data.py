@@ -7,9 +7,8 @@ from pydantic import Field
 
 from kiara import KiaraModule
 from kiara.config import KiaraModuleConfig
-from kiara.data.values import ValueSchema
+from kiara.data.values import ValueSchema, ValueSet
 from kiara.exceptions import KiaraProcessingException
-from kiara.module import StepInputs, StepOutputs
 
 
 class MapModuleConfig(KiaraModuleConfig):
@@ -61,7 +60,7 @@ class MapModule(KiaraModule):
 
         self._module_input_name = self.get_config_value("input_name")
         if self._module_input_name is None:
-            if len(self.child_module.input_names) == 1:
+            if len(list(self.child_module.input_names)) == 1:
                 self._module_input_name = next(iter(self.child_module.input_names))
             else:
                 raise KiaraProcessingException(
@@ -76,7 +75,9 @@ class MapModule(KiaraModule):
         str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
     ]:
 
-        inputs = {
+        inputs: typing.Dict[
+            str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
+        ] = {
             "array": {
                 "type": "array",
                 "doc": "The array containing the values the filter is applied on.",
@@ -103,21 +104,21 @@ class MapModule(KiaraModule):
         }
         return outputs
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         input_array: pa.Array = inputs.get_value_data("array")
 
         module_name = self.get_config_value("module_type")
         module_config = self.get_config_value("module_config")
-        module_obj = self._kiara.create_module(
+        module_obj: KiaraModule = self._kiara.create_module(
             "_map_module", module_name, module_config=module_config
         )
         # TODO: validate that the selected module is appropriate
-        assert len(module_obj.output_names) == 1
+        assert len(list(module_obj.output_names)) == 1
 
         module_output_name = list(module_obj.output_names)[0]
 
-        init_data = {}
+        init_data: typing.Dict[str, typing.Any] = {}
         for input_name in self.input_schemas.keys():
             if input_name in ["array", self.module_input_name]:
                 continue
@@ -129,6 +130,7 @@ class MapModule(KiaraModule):
 
             def run_module(item):
                 _d = copy.copy(init_data)
+                assert self._module_input_name is not None
                 _d[self._module_input_name] = item
                 r = module_obj.run(**_d)
                 return r.get_all_value_data()
@@ -141,6 +143,7 @@ class MapModule(KiaraModule):
             results = []
             for item in input_array:
                 _d = copy.copy(init_data)
+                assert self._module_input_name is not None
                 _d[self._module_input_name] = item
                 r = module_obj.run(**_d)
                 results.append(r.get_all_value_data())
@@ -148,7 +151,7 @@ class MapModule(KiaraModule):
         result_list = []
         result_types = set()
         for r in results:
-            r_item = r[module_output_name]
+            r_item = r[module_output_name]  # type: ignore
             result_list.append(r_item)
             result_types.add(type(r_item))
 

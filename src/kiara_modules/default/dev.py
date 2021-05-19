@@ -8,8 +8,7 @@ from pydantic import Field
 
 from kiara import KiaraModule
 from kiara.config import KiaraModuleConfig
-from kiara.data.values import ValueSchema
-from kiara.module import StepInputs, StepOutputs
+from kiara.data.values import ValueSchema, ValueSet
 
 
 class DummyProcessingModuleConfig(KiaraModuleConfig):
@@ -57,7 +56,7 @@ class DummyModule(KiaraModule):
             result[k] = schema
         return result
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
         """Returns the hardcoded output values that are set in the ``outputs`` config field.
 
         Optionally, this module can simulate processing by waiting a configured amount of time (seconds -- specified in the ``delay`` config parameter).

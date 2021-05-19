@@ -6,9 +6,8 @@ from pydantic import Field, validator
 from kiara import KiaraModule
 from kiara.config import KiaraModuleConfig
 from kiara.data.types.files import FileBundleModel, FileModel
-from kiara.data.values import ValueSchema
+from kiara.data.values import ValueSchema, ValueSet
 from kiara.exceptions import KiaraProcessingException
-from kiara.module import StepInputs, StepOutputs
 
 
 class CreateTableModuleConfig(KiaraModuleConfig):
@@ -54,9 +53,9 @@ class CreateTableFromFileModule(KiaraModule):
     ]:
         return {"table": {"type": "table", "doc": "the imported table"}}
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
-        input_file: FileModel = inputs.file
+        input_file: FileModel = inputs.get_value_data("file")
 
         imported_data = pa.csv.read_csv(input_file.path)
 
@@ -147,7 +146,7 @@ class CreateTableFromTextFilesModule(KiaraModule):
 
         return outputs
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         bundle: FileBundleModel = inputs.get_value_data("files")
 
@@ -167,7 +166,7 @@ class CreateTableFromTextFilesModule(KiaraModule):
             for index, rel_path in enumerate(sorted(file_dict.keys())):
 
                 if column == "content":
-                    value = file_dict[rel_path]
+                    value: typing.Any = file_dict[rel_path]
                 elif column == "id":
                     value = index
                 elif column == "rel_path":
@@ -209,7 +208,7 @@ class MergeTableModule(KiaraModule):
         }
         return outputs
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         sources = inputs.get_value_data("sources")
 
@@ -291,7 +290,7 @@ class FilterTableModule(KiaraModule):
         outputs = {"table": {"type": "table", "doc": "The filtered table."}}
         return outputs
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         input_table: pa.Table = inputs.get_value_data("table")
         filter_array: pa.Array = inputs.get_value_data("mask")

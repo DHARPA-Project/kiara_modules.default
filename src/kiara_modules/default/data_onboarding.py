@@ -5,8 +5,7 @@ from pydantic import Field
 from kiara import KiaraModule
 from kiara.config import KiaraModuleConfig
 from kiara.data.types.files import FileBundleModel, FileModel, FolderImportConfig
-from kiara.data.values import ValueSchema
-from kiara.module import StepInputs, StepOutputs
+from kiara.data.values import ValueSchema, ValueSet
 
 
 class ImportLocalPathConfig(KiaraModuleConfig):
@@ -41,7 +40,7 @@ class ImportLocalFileModule(KiaraModule):
             }
         }
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         path = inputs.get_value_data("path")
         file_model = FileModel.import_file(path)
@@ -84,7 +83,7 @@ class ImportLocalFolderModule(KiaraModule):
             }
         }
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         path = inputs.get_value_data("path")
 

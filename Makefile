@@ -38,6 +38,7 @@ init: clean ## initialize a development environment (to be run in virtualenv)
 	pip install -U git+https://github.com/DHARPA-Project/kiara.git#egg=kiara[cli]
 	pip install --extra-index-url https://gitlab.com/api/v4/projects/25344049/packages/pypi/simple -U -e '.[all_dev]'
 	pre-commit install
+	pre-commit install --hook-type commit-msg
 	setup-cfg-fmt setup.cfg || true
 	git add "*" ".*"
 	pre-commit run --all-files || true

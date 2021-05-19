@@ -4,8 +4,8 @@ import typing
 from pydantic import Field
 
 from kiara.config import KiaraModuleConfig
-from kiara.data.values import ValueSchema
-from kiara.module import KiaraModule, StepInputs, StepOutputs
+from kiara.data.values import ValueSchema, ValueSet
+from kiara.module import KiaraModule
 
 
 class LogicProcessingModuleConfig(KiaraModuleConfig):
@@ -51,12 +51,12 @@ class NotModule(LogicProcessingModule):
             }
         }
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
         """Negates the input boolean."""
 
         time.sleep(self.config.get("delay"))  # type: ignore
 
-        outputs.set_value("y", not inputs.a)
+        outputs.set_value("y", not inputs.get_value_data("a"))
 
 
 class AndModule(LogicProcessingModule):
@@ -86,11 +86,13 @@ class AndModule(LogicProcessingModule):
             }
         }
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         time.sleep(self.config.delay)  # type: ignore
 
-        outputs.set_value("y", inputs.a and inputs.b)
+        outputs.set_value(
+            "y", inputs.get_value_data("a") and inputs.get_value_data("b")
+        )
 
 
 class OrModule(LogicProcessingModule):
@@ -120,7 +122,7 @@ class OrModule(LogicProcessingModule):
             }
         }
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         time.sleep(self.config.get("delay"))  # type: ignore
-        outputs.set_value("y", inputs.a or inputs.b)
+        outputs.set_value("y", inputs.get_value_data("a") or inputs.get_value_data("b"))

@@ -11,9 +11,8 @@ import typing
 from dateutil import parser
 
 from kiara import KiaraModule
-from kiara.data.values import ValueSchema
+from kiara.data.values import ValueSchema, ValueSet
 from kiara.exceptions import KiaraProcessingException
-from kiara.module import StepInputs, StepOutputs
 
 
 class ExtractDateModule(KiaraModule):
@@ -34,7 +33,7 @@ class ExtractDateModule(KiaraModule):
             "date": {"type": "date", "doc": "The date extracted from the input string."}
         }
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         text = inputs.get_value_data("text")
 
@@ -54,7 +53,7 @@ class DateRangeCheckModule(KiaraModule):
     ) -> typing.Mapping[
         str, typing.Union[ValueSchema, typing.Mapping[str, typing.Any]]
     ]:
-        inputs = {
+        inputs: typing.Dict[str, typing.Dict[str, typing.Any]] = {
             "date": {"type": "date", "doc": "The date to check."},
             "earliest": {
                 "type": "date",
@@ -83,7 +82,7 @@ class DateRangeCheckModule(KiaraModule):
         }
         return outputs
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         d = inputs.get_value_data("date")
         earliest: typing.Optional[datetime.datetime] = inputs.get_value_data("earliest")

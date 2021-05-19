@@ -2,8 +2,7 @@
 import typing
 
 from kiara import KiaraModule
-from kiara.data.values import ValueSchema
-from kiara.module import StepInputs, StepOutputs
+from kiara.data.values import ValueSchema, ValueSet
 
 
 class IncludedInListCheckModule(KiaraModule):
@@ -36,7 +35,7 @@ class IncludedInListCheckModule(KiaraModule):
         }
         return outputs
 
-    def process(self, inputs: StepInputs, outputs: StepOutputs) -> None:
+    def process(self, inputs: ValueSet, outputs: ValueSet) -> None:
 
         item_list = inputs.get_value_data("list")
         item = inputs.get_value_data("item")
