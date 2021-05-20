@@ -7,6 +7,14 @@
       "title": "Pipeline Id",
       "type": "string"
     },
+    "type": {
+      "title": "Type",
+      "default": "pipeline_output",
+      "enum": [
+        "pipeline_output"
+      ],
+      "type": "string"
+    },
     "updated_pipeline_outputs": {
       "title": "Updated Pipeline Outputs",
       "description": "list of pipeline output names that where changed",

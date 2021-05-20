@@ -1,6 +1,6 @@
 {
   "title": "Value",
-  "description": "A pointer to 'actual' data (bytes), along with metadata associated with this data.\n\nThis object is created by a [DataRegistry][kiara.data.registry.DataRegistry], and can be used to retrieve the associated data\nfrom that registry. In addition, it can be used to subscribe to change events for that data, using the [register_callback][kiara.data.registry.DataRegistry.register_callback] method.\nThe reason the data itself is not contained within this model is that the data could be very big,\nand it might not be necessary to hold them in memory in a lot of cases.",
+  "description": "The underlying base class for all values.\n\nThe important subclasses here are the ones inheriting from 'KiaraValue', as those are registered in the data\nregistry.",
   "type": "object",
   "properties": {
     "id": {
@@ -16,14 +16,6 @@
           "$ref": "#/definitions/ValueSchema"
         }
       ]
-    },
-    "value_fields": {
-      "title": "Value Fields",
-      "description": "Value fields within a pipeline connected to this value.",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/ValueField"
-      }
     },
     "is_constant": {
       "title": "Is Constant",
@@ -60,6 +52,19 @@
       "description": "Whether the value is 'None'.",
       "default": true,
       "type": "boolean"
+    },
+    "value_hash": {
+      "title": "Value Hash",
+      "description": "The hash of the current value.",
+      "default": "-- no_value --",
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "$ref": "#/definitions/ValueHashMarker"
+        }
+      ]
     },
     "metadata": {
       "title": "Metadata",
@@ -110,29 +115,14 @@
         "type"
       ]
     },
-    "ValueField": {
-      "title": "ValueField",
-      "description": "An object that holds information about the location of a value within a pipeline.\n\nThis object does not contain the value itself.\n\nThere are four different ValuePoint types:\n\n- [kiara.data.values.StepInputField][]: an input to a step\n- [kiara.data.values.StepOutputField][]: an output of a step\n- [kiara.data.values.PipelineInputField][]: an input to a pipeline\n- [kiara.data.values.PipelineOutputField][]: an output for a pipeline\n\nSeveral point objects can target the same value, for example a step output and a connected step input are\nactually the same.",
-      "type": "object",
-      "properties": {
-        "value_name": {
-          "title": "Value Name",
-          "type": "string"
-        },
-        "value_schema": {
-          "$ref": "#/definitions/ValueSchema"
-        },
-        "pipeline_id": {
-          "title": "Pipeline Id",
-          "type": "string"
-        }
-      },
-      "required": [
-        "value_name",
-        "value_schema",
-        "pipeline_id"
-      ],
-      "additionalProperties": false
+    "ValueHashMarker": {
+      "title": "ValueHashMarker",
+      "description": "An enumeration.",
+      "enum": [
+        "-- no_value --",
+        "-- deferred --",
+        "-- no_hash --"
+      ]
     }
   }
 }

@@ -90,7 +90,7 @@
         "sub_value": {
           "title": "Sub Value",
           "description": "A reference to a subitem of a value (e.g. column, list item)",
-          "type": "string"
+          "type": "object"
         }
       },
       "required": [
@@ -387,6 +387,15 @@
       ],
       "additionalProperties": false
     },
+    "ValueHashMarker": {
+      "title": "ValueHashMarker",
+      "description": "An enumeration.",
+      "enum": [
+        "-- no_value --",
+        "-- deferred --",
+        "-- no_hash --"
+      ]
+    },
     "PipelineValue": {
       "title": "PipelineValue",
       "description": "Convenience wrapper to make the [PipelineState][kiara.pipeline.pipeline.PipelineState] json/dict export prettier.",
@@ -435,6 +444,18 @@
           "type": "string",
           "format": "date-time"
         },
+        "value_hash": {
+          "title": "Value Hash",
+          "description": "The hash of the current value.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ValueHashMarker"
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        },
         "is_streaming": {
           "title": "Is Streaming",
           "description": "Whether the value is currently streamed into this object.",
@@ -450,7 +471,8 @@
       "required": [
         "id",
         "is_set",
-        "value_schema"
+        "value_schema",
+        "value_hash"
       ],
       "additionalProperties": false
     },

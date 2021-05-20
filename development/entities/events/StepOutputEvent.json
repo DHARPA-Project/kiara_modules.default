@@ -7,6 +7,14 @@
       "title": "Pipeline Id",
       "type": "string"
     },
+    "type": {
+      "title": "Type",
+      "default": "step_output",
+      "enum": [
+        "step_output"
+      ],
+      "type": "string"
+    },
     "updated_step_outputs": {
       "title": "Updated Step Outputs",
       "description": "steps (keys) that finished processing of one, several or all outputs (values are list of 'finished' output fields)",

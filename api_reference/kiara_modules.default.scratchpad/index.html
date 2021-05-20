@@ -12,7 +12,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.4">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.5">
     
     
       
@@ -285,8 +285,32 @@
   
   
     <li class="md-nav__item">
+      <a href="../kiara_modules.default.array_data/" class="md-nav__link">
+        ➜ array_data
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../kiara_modules.default.data_onboarding/" class="md-nav__link">
         ➜ data_onboarding
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kiara_modules.default.dates/" class="md-nav__link">
+        ➜ dates
       </a>
     </li>
   
@@ -311,6 +335,18 @@
     <li class="md-nav__item">
       <a href="../kiara_modules.default.dev/" class="md-nav__link">
         ➜ dev
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kiara_modules.default.lists/" class="md-nav__link">
+        ➜ lists
       </a>
     </li>
   
@@ -422,6 +458,18 @@
   
 </nav>
       
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kiara_modules.default.strings/" class="md-nav__link">
+        ➜ strings
+      </a>
     </li>
   
 
@@ -672,13 +720,13 @@ Later on, this will be replaced by a more generic module (or pipeline).</p>
   <tbody>
       <tr>
         <td><code>inputs</code></td>
-        <td><code>StepInputs</code></td>
+        <td><code>ValueSet</code></td>
         <td><p>the input value set</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
         <td><code>outputs</code></td>
-        <td><code>StepOutputs</code></td>
+        <td><code>ValueSet</code></td>
         <td><p>the output value set</p></td>
         <td><em>required</em></td>
       </tr>
@@ -686,9 +734,9 @@ Later on, this will be replaced by a more generic module (or pipeline).</p>
 </table>
         <details class="quote">
           <summary>Source code in <code>default/scratchpad.py</code></summary>
-          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">StepInputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span> <span class="n">StepOutputs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+          <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">ValueSet</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span> <span class="n">ValueSet</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
-    <span class="n">t</span><span class="p">:</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">Table</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">table</span>
+    <span class="n">t</span><span class="p">:</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">Table</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">get_value_data</span><span class="p">(</span><span class="s2">&quot;table&quot;</span><span class="p">)</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
 
     <span class="n">df1</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">11</span><span class="p">]</span>
@@ -725,9 +773,7 @@ Later on, this will be replaced by a more generic module (or pipeline).</p>
     <span class="n">extr_nodes_unique</span> <span class="o">=</span> <span class="n">extr_nodes</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Id&quot;</span><span class="p">])</span>
 
     <span class="n">result</span> <span class="o">=</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="n">extr_nodes_unique</span><span class="p">)</span>
-    <span class="n">outputs</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">result</span>
-
-    <span class="n">outputs</span><span class="o">.</span><span class="n">index_column_name</span> <span class="o">=</span> <span class="s2">&quot;Id&quot;</span>
+    <span class="n">outputs</span><span class="o">.</span><span class="n">set_values</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">index_column_name</span><span class="o">=</span><span class="s2">&quot;Id&quot;</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -790,13 +836,13 @@ Later on, this will be replaced by a more generic module (or pipeline).</p>
         </a>
       
       
-        <a href="../kiara_modules.default.tabular_data/" class="md-footer__link md-footer__link--next" rel="next">
+        <a href="../kiara_modules.default.strings/" class="md-footer__link md-footer__link--next" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              ➜ tabular_data
+              ➜ strings
             </div>
           </div>
           <div class="md-footer__button md-icon">
@@ -825,10 +871,10 @@ Later on, this will be replaced by a more generic module (or pipeline).</p>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.4fa0e4ee.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../../assets/javascripts/workers/search.d351de03.min.js", "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.1d3bfcf1.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a1609d9a.min.js"></script>
       
     
   </body>

@@ -7,6 +7,14 @@
       "title": "Pipeline Id",
       "type": "string"
     },
+    "type": {
+      "title": "Type",
+      "default": "step_input",
+      "enum": [
+        "step_input"
+      ],
+      "type": "string"
+    },
     "updated_step_inputs": {
       "title": "Updated Step Inputs",
       "description": "steps (keys) with updated inputs which need re-processing (value is list of updated input names)",

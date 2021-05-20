@@ -46,6 +46,18 @@
       "type": "string",
       "format": "date-time"
     },
+    "value_hash": {
+      "title": "Value Hash",
+      "description": "The hash of the current value.",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/ValueHashMarker"
+        },
+        {
+          "type": "integer"
+        }
+      ]
+    },
     "is_streaming": {
       "title": "Is Streaming",
       "description": "Whether the value is currently streamed into this object.",
@@ -61,7 +73,8 @@
   "required": [
     "id",
     "is_set",
-    "value_schema"
+    "value_schema",
+    "value_hash"
   ],
   "additionalProperties": false,
   "definitions": {
@@ -100,6 +113,15 @@
       },
       "required": [
         "type"
+      ]
+    },
+    "ValueHashMarker": {
+      "title": "ValueHashMarker",
+      "description": "An enumeration.",
+      "enum": [
+        "-- no_value --",
+        "-- deferred --",
+        "-- no_hash --"
       ]
     }
   }

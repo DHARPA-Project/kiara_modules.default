@@ -96,7 +96,7 @@
         "sub_value": {
           "title": "Sub Value",
           "description": "A reference to a subitem of a value (e.g. column, list item)",
-          "type": "string"
+          "type": "object"
         }
       },
       "required": [

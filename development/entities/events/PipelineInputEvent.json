@@ -7,6 +7,14 @@
       "title": "Pipeline Id",
       "type": "string"
     },
+    "type": {
+      "title": "Type",
+      "default": "pipeline_input",
+      "enum": [
+        "pipeline_input"
+      ],
+      "type": "string"
+    },
     "updated_pipeline_inputs": {
       "title": "Updated Pipeline Inputs",
       "description": "list of pipeline input names that where changed",
