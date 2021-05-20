@@ -8,9 +8,9 @@ from networkx import Graph
 from pydantic import Field, validator
 
 from kiara import KiaraModule
-from kiara.config import KiaraModuleConfig
 from kiara.data.values import ValueSchema, ValueSet
 from kiara.exceptions import KiaraProcessingException
+from kiara.module_config import KiaraModuleConfig
 
 
 class GraphTypesEnum(Enum):

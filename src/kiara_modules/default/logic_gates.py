@@ -3,9 +3,9 @@ import time
 import typing
 from pydantic import Field
 
-from kiara.config import KiaraModuleConfig
 from kiara.data.values import ValueSchema, ValueSet
 from kiara.module import KiaraModule
+from kiara.module_config import KiaraModuleConfig
 
 
 class LogicProcessingModuleConfig(KiaraModuleConfig):

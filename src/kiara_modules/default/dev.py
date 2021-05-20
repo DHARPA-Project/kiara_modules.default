@@ -7,8 +7,8 @@ import typing
 from pydantic import Field
 
 from kiara import KiaraModule
-from kiara.config import KiaraModuleConfig
 from kiara.data.values import ValueSchema, ValueSet
+from kiara.module_config import KiaraModuleConfig
 
 
 class DummyProcessingModuleConfig(KiaraModuleConfig):

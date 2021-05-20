@@ -46,7 +46,12 @@ class ExtractDateModule(KiaraModule):
 
 
 class DateRangeCheckModule(KiaraModule):
-    """Check whether a date falls within a specified date range."""
+    """Check whether a date falls within a specified date range.
+
+    At least one of the inputs 'earliest' or 'latest' must be set, it's allowed to set both, though.
+
+    Return ``True`` if that's the case, otherwise ``False``.
+    """
 
     def create_input_schema(
         self,

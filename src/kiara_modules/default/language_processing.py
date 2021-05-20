@@ -13,9 +13,9 @@ from spacy.tokens import Doc
 from spacy.util import DummyTokenizer
 
 from kiara import KiaraModule
-from kiara.config import KiaraModuleConfig
 from kiara.data.values import ValueSchema, ValueSet
 from kiara.exceptions import KiaraProcessingException
+from kiara.module_config import KiaraModuleConfig
 
 
 def get_stopwords():

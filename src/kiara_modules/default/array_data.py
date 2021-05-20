@@ -6,9 +6,9 @@ from concurrent.futures import ThreadPoolExecutor
 from pydantic import Field
 
 from kiara import KiaraModule
-from kiara.config import KiaraModuleConfig
 from kiara.data.values import ValueSchema, ValueSet
 from kiara.exceptions import KiaraProcessingException
+from kiara.module_config import KiaraModuleConfig
 
 
 class MapModuleConfig(KiaraModuleConfig):
@@ -26,12 +26,32 @@ class MapModuleConfig(KiaraModuleConfig):
 
 
 class MapModule(KiaraModule):
-    """Map a list of values into another list of values.
-
-    Currently, this only supports a single
-    """
+    """Map a list of values into another list of values."""
 
     _config_cls = MapModuleConfig
+
+    def module_instance_doc(self) -> str:
+
+        config: MapModuleConfig = self.config  # type: ignore
+
+        module_type = config.module_type
+        module_config = config.module_config
+
+        m = self._kiara.create_module(
+            "id", module_type=module_type, module_config=module_config
+        )
+        doc = m.doc()
+        link = m.source_link()
+        if not link:
+            link_str = f"``{module_type}``"
+        else:
+            link_str = f"[``{module_type}``]({link})"
+
+        result = f"""Map the values of the input list onto a new list of the same length, using the {link_str} module."""
+
+        if doc and doc != "-- n/a --":
+            result = result + f"\n\n``{module_type}`` documentation:\n\n{doc}"
+        return result
 
     def __init__(self, *args, **kwargs):
 

@@ -6,9 +6,9 @@ from pprint import pformat
 from pydantic import Field
 
 from kiara import KiaraModule
-from kiara.config import KiaraModuleConfig
 from kiara.data.values import Value, ValueSchema, ValueSet
 from kiara.exceptions import KiaraProcessingException
+from kiara.module_config import KiaraModuleConfig
 from kiara.utils.pretty_print import pretty_print_arrow_table
 
 
@@ -49,6 +49,7 @@ class RegexModuleConfig(KiaraModuleConfig):
 
 
 class RegexModule(KiaraModule):
+    """Check whether the input string matches a provided regular expression."""
 
     _config_cls = RegexModuleConfig
 

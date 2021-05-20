@@ -4,10 +4,10 @@ import typing
 from pydantic import Field, validator
 
 from kiara import KiaraModule
-from kiara.config import KiaraModuleConfig
 from kiara.data.types.files import FileBundleModel, FileModel
 from kiara.data.values import ValueSchema, ValueSet
 from kiara.exceptions import KiaraProcessingException
+from kiara.module_config import KiaraModuleConfig
 
 
 class CreateTableModuleConfig(KiaraModuleConfig):
