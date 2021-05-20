@@ -16,10 +16,8 @@ jobs:
         with:
           python-version: "${{ matrix.python_version }}"
       - uses: actions/checkout@v2
-      - name: install kiara from git
-        run: pip install -U git+https://github.com/DHARPA-Project/kiara.git#egg=kiara
-      - name: install other requirements
-        run: pip install -U -e '.[dev_testing,all]'
+      - name: install kiara_modules.default
+        run: pip install -U pip install --pre --extra-index-url https://pypi.fury.io/dharpa/ .[all,dev_testing]
       - name: Test with pytest
         run: make test
 
@@ -35,10 +33,8 @@ jobs:
         with:
           python-version: "${{ matrix.python_version }}"
       - uses: actions/checkout@v2
-      - name: install kiara from git
-        run: pip install -U git+https://github.com/DHARPA-Project/kiara.git#egg=kiara
-      - name: install other requirements
-        run: pip install -U -e '.[dev_testing,all]'
+      - name: install kiara_modules.default
+        run: pip install -U pip install --pre --extra-index-url https://pypi.fury.io/dharpa/ .[all,dev_testing]
       - name: Test with mypy
         run: make mypy
 
@@ -51,10 +47,8 @@ jobs:
         with:
           python-version: 3.9
       - uses: actions/checkout@v2
-      - name: install kiara from git
-        run: pip install -U git+https://github.com/DHARPA-Project/kiara.git#egg=kiara
-      - name: install other requirements
-        run: pip install -U -e '.[dev_testing,all]'
+      - name: install kiara_modules.default
+        run: pip install -U pip install --pre --extra-index-url https://pypi.fury.io/dharpa/ .[all,dev_testing]
       - name: Test with flake8
         run: make flake
 
@@ -71,10 +65,8 @@ jobs:
         with:
           python-version: 3.9.1
       - uses: actions/checkout@v2
-      - name: install kiara from git
-        run: pip install -U git+https://github.com/DHARPA-Project/kiara.git#egg=kiara
-      - name: install other requirements
-        run: pip install  --extra-index-url https://gitlab.com/api/v4/projects/25344049/packages/pypi/simple -e '.[dev_documentation,all]'
+      - name: install kiara
+        run: pip install -U pip install --pre  --extra-index-url https://gitlab.com/api/v4/projects/25344049/packages/pypi/simple --extra-index-url https://pypi.fury.io/dharpa/ .[all,dev_documentation]
       - name: create documentation
         run: make docs
       - name: deploy documentation to gh-pages
@@ -83,3 +75,25 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
           FOLDER: build/site
+
+  release_package:
+    name: release python package to gemfury
+    runs-on: ubuntu-latest
+    env:
+        GEMFURY_PUSH_TOKEN: ${{ secrets.GEMFURY_PUSH_TOKEN }}
+    steps:
+      - name: Set up Python 3.9.1
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9.1
+      - uses: actions/checkout@v2
+      - name: install kiara
+        run: pip install -U pip install --pre  --extra-index-url https://gitlab.com/api/v4/projects/25344049/packages/pypi/simple --extra-index-url https://pypi.fury.io/dharpa/ .[all]
+      - name: install 'wheel' package
+        run: pip install -U wheel
+      - name: create packages
+        run: python setup.py sdist bdist_wheel
+      - name: upload source package
+        run: curl -F package=@$(ls dist/kiara-*.tar.gz) https://${GEMFURY_PUSH_TOKEN}@dharpa.fury.land:443/pypi/
+      - name: upload wheel
+        run: curl -F package=@$(ls dist/kiara-*.whl) https://${GEMFURY_PUSH_TOKEN}@dharpa.fury.land:443/pypi/
