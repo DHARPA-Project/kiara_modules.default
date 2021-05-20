@@ -54,6 +54,7 @@ jobs:
 
   build-docs:
     name: build documentation
+    if: ${{ github.ref == 'refs/heads/develop' }}
     runs-on: ubuntu-latest
     needs:
       - test-linux
@@ -78,6 +79,7 @@ jobs:
 
   release_package:
     name: release python package to gemfury
+    if: ${{ github.ref == 'refs/heads/develop' }}
     runs-on: ubuntu-latest
     env:
         GEMFURY_PUSH_TOKEN: ${{ secrets.GEMFURY_PUSH_TOKEN }}
@@ -94,6 +96,6 @@ jobs:
       - name: create packages
         run: python setup.py sdist bdist_wheel
       - name: upload source package
-        run: curl -F package=@$(ls dist/kiara-*.tar.gz) https://${GEMFURY_PUSH_TOKEN}@dharpa.fury.land:443/pypi/
+        run: curl -F package=@$(ls dist/kiara*.tar.gz) https://${GEMFURY_PUSH_TOKEN}@dharpa.fury.land:443/pypi/
       - name: upload wheel
-        run: curl -F package=@$(ls dist/kiara-*.whl) https://${GEMFURY_PUSH_TOKEN}@dharpa.fury.land:443/pypi/
+        run: curl -F package=@$(ls dist/kiara*.whl) https://${GEMFURY_PUSH_TOKEN}@dharpa.fury.land:443/pypi/
